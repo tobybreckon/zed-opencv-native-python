@@ -51,7 +51,7 @@ class CameraVideoStream:
 
 			# otherwise, read the next frame from the stream
 			# provided we are not suspended
-			
+
 			if not(self.suspend):
 				(self.grabbed, self.frame) = self.camera.read()
 
