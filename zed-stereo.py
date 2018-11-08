@@ -105,6 +105,7 @@ except KeyError:
 print();
 print("ZED left/right resolution: ", int(width/2), " x ",  int(height));
 print("ZED mode: ", camera_config);
+print("Press <space> to change camera mode);
 print();
 
 ################################################################################
@@ -216,6 +217,10 @@ if (zed_cam.isOpened()) :
             height =  int(zed_cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
             print ("Camera config confirmed back from camera as: ", width , " x ", height);
+            print();
+            print("ZED left/right resolution: ", int(width/2), " x ",  int(height));
+            print("ZED mode: ", camera_config);
+            print();
 
             cv2.resizeWindow(windowName, width, height);
             cv2.resizeWindow(windowNameD, int(width/2), height);
