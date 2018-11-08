@@ -66,9 +66,9 @@ else:
 
 # parse camera configuration as an INI format file
 
-cam_config = configparser.ConfigParser();
-cam_config.read(path_to_config_file);
-print(cam_config.sections())
+cam_calibration = configparser.ConfigParser();
+cam_calibration.read(path_to_config_file);
+print(cam_calibration.sections())
 
 ################################################################################
 
@@ -95,7 +95,7 @@ config_options_width = {4416: "2K", 3840: "FHD", 2560: "HD", 1344: "VGA"};
 config_options_height = {1242: "2K", 1080: "FHD", 720: "HD", 376: "VGA"};
 
 try:
-    camera_config = config_options_width[width];
+    camera_mode = config_options_width[width];
 except KeyError:
     print("Error - selected camera #", args.camera_to_use,
     " : resolution does not match a known ZED configuration profile.");
@@ -104,8 +104,8 @@ except KeyError:
 
 print();
 print("ZED left/right resolution: ", int(width/2), " x ",  int(height));
-print("ZED mode: ", camera_config);
-print("Press <space> to change camera mode);
+print("ZED mode: ", camera_mode);
+print("Press <space> to change camera mode");
 print();
 
 ################################################################################
@@ -113,6 +113,8 @@ print();
 # process config to get camera calibration from calibration file
 
 # TODO
+
+# camera_calibration(cam_calibration, camera_mode)
 
 ################################################################################
 
@@ -196,14 +198,14 @@ if (zed_cam.isOpened()) :
 
                     if (list_widths[pos % len(list_widths)] == width):
 
-                        camera_config = config_options_width[list_widths[(pos+1) % len(list_widths)]]
+                        camera_mode = config_options_width[list_widths[(pos+1) % len(list_widths)]]
 
                         # get new camera resolution
 
-                        width = next(key for key, value in config_options_width.items() if value == camera_config)
-                        height = next(key for key, value in config_options_height.items() if value == camera_config)
+                        width = next(key for key, value in config_options_width.items() if value == camera_mode)
+                        height = next(key for key, value in config_options_height.items() if value == camera_mode)
 
-                        print ("Changing camera config to use: ", camera_config, " @ ", width, " x ", height);
+                        print ("Changing camera config to use: ", camera_mode, " @ ", width, " x ", height);
                         break;
 
                     pos+=1
@@ -219,7 +221,7 @@ if (zed_cam.isOpened()) :
             print ("Camera config confirmed back from camera as: ", width , " x ", height);
             print();
             print("ZED left/right resolution: ", int(width/2), " x ",  int(height));
-            print("ZED mode: ", camera_config);
+            print("ZED mode: ", camera_mode);
             print();
 
             cv2.resizeWindow(windowName, width, height);
