@@ -91,10 +91,11 @@ height,width, channels = frame.shape;
 # 720p 	60 	    2560 x 720      HD
 # WVGA 	100 	1344 x 376      VGA
 
-config_options = {4416: "2K", 3840: "FHD", 2560: "HD", 1344: "VGA"};
+config_options_width = {4416: "2K", 3840: "FHD", 2560: "HD", 1344: "VGA"};
+config_options_height = {1242: "2K", 1080: "FHD", 720: "HD", 376: "VGA"};
 
 try:
-    camera_config = config_options[width];
+    camera_config = config_options_width[width];
 except KeyError:
     print("Error - selected camera #", args.camera_to_use,
     " : resolution does not match a known ZED configuration profile.");
@@ -128,9 +129,10 @@ if (zed_cam.isOpened()) :
     # create window by name (as resizable)
 
     cv2.namedWindow(windowName, cv2.WINDOW_NORMAL);
-    cv2.namedWindow(windowNameD, cv2.WINDOW_NORMAL);
+    cv2.resizeWindow(windowName, width, height);
 
-    # TODO - force window sizes to camera resolution
+    cv2.namedWindow(windowNameD, cv2.WINDOW_NORMAL);
+    cv2.resizeWindow(windowNameD, int(width/2), height);
 
     # loop control flag
 
@@ -181,8 +183,43 @@ if (zed_cam.isOpened()) :
             keep_processing = False;
         elif (key == ord('f')):
             cv2.setWindowProperty(windowName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN);
+        elif (key == ord(' ')):
 
-        # TODO - cycle camera resolutions
+            # cycle camera resolutions to get the next one on the list
+
+            pos = 0;
+            list_widths = list(config_options_width.keys())
+            list_heights = list(config_options_height.keys())
+
+            for (width_resolution, config_name) in config_options_width.items():
+
+                    if (list_widths[pos % len(list_widths)] == width):
+
+                        camera_config = config_options_width[list_widths[(pos+1) % len(list_widths)]]
+
+                        # get new camera resolution
+
+                        width = next(key for key, value in config_options_width.items() if value == camera_config)
+                        height = next(key for key, value in config_options_height.items() if value == camera_config)
+
+                        print ("Changing camera config to use: ", camera_config, " @ ", width, " x ", height);
+                        break;
+
+                    pos+=1
+
+            # reset to new camera resolution
+
+            zed_cam.set(cv2.CAP_PROP_FRAME_WIDTH, float(width))
+            zed_cam.set(cv2.CAP_PROP_FRAME_HEIGHT, float(height))
+
+            width = int(zed_cam.get(cv2.CAP_PROP_FRAME_WIDTH))
+            height =  int(zed_cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+            print ("Camera config confirmed back from camera as: ", width , " x ", height);
+
+            cv2.resizeWindow(windowName, width, height);
+            cv2.resizeWindow(windowNameD, int(width/2), height);
+
 
     # close all windows
 
