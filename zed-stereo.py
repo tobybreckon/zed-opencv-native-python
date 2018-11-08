@@ -17,6 +17,7 @@ import requests
 import configparser
 
 from camera_stream import *
+from zed_calibration import *
 
 ################################################################################
 
@@ -68,7 +69,6 @@ else:
 
 cam_calibration = configparser.ConfigParser();
 cam_calibration.read(path_to_config_file);
-print(cam_calibration.sections())
 
 ################################################################################
 
@@ -112,9 +112,7 @@ print();
 
 # process config to get camera calibration from calibration file
 
-# TODO
-
-# camera_calibration(cam_calibration, camera_mode)
+mapL1, mapL2, mapR1, mapR2 = zed_camera_calibration(cam_calibration, camera_mode, width, height);
 
 ################################################################################
 
@@ -122,6 +120,27 @@ print();
 
 windowName = "Live Camera Input"; # window name
 windowNameD = "Stereo Disparity"; # window name
+
+################################################################################
+
+# set up defaults for stereo disparity calculation
+
+max_disparity = 128;
+window_size = 21;
+
+stereoProcessor = cv2.StereoSGBM_create(
+        minDisparity=0,
+        numDisparities = max_disparity, # max_disp has to be dividable by 16 f. E. HH 192, 256
+        blockSize=window_size,
+        #P1=8 * window_size ** 2,       # 8*number_of_image_channels*SADWindowSize*SADWindowSize
+        #P2=32 * window_size ** 2,      # 32*number_of_image_channels*SADWindowSize*SADWindowSize
+        #disp12MaxDiff=1,
+        #uniquenessRatio=15,
+        #speckleWindowSize=0,
+        #speckleRange=2,
+        #preFilterCap=63,
+        mode=cv2.STEREO_SGBM_MODE_HH
+)
 
 ################################################################################
 
@@ -140,6 +159,7 @@ if (zed_cam.isOpened()) :
     # loop control flag
 
     keep_processing = True;
+    apply_colourmap = False;
 
     while (keep_processing):
 
@@ -163,11 +183,42 @@ if (zed_cam.isOpened()) :
         frameL= frame[:,0:int(width/2),:]
         frameR = frame[:,int(width/2):width,:]
 
-        # perform stereo disparity computation - TODO
+        # remember to convert to grayscale (as the disparity matching works on grayscale)
 
-        # scale, filter and colour map for display - TODO
+        grayL = cv2.cvtColor(frameL,cv2.COLOR_BGR2GRAY);
+        grayR = cv2.cvtColor(frameR,cv2.COLOR_BGR2GRAY);
 
-        # display image
+        # undistort and rectify based on the mappings (could improve interpolation and image border settings here)
+        # N.B. mapping works independant of number of image channels
+
+        undistorted_rectifiedL = cv2.remap(grayL, mapL1, mapL2, cv2.INTER_LINEAR);
+        undistorted_rectifiedR = cv2.remap(grayR, mapR1, mapR2, cv2.INTER_LINEAR);
+
+        # compute disparity image from undistorted and rectified versions
+        # (which for reasons best known to the OpenCV developers is returned scaled by 16)
+
+        disparity = stereoProcessor.compute(undistorted_rectifiedL,undistorted_rectifiedR);
+        cv2.filterSpeckles(disparity, 0, 4000, max_disparity);
+
+        # scale the disparity to 8-bit for viewing
+        # divide by 16 and convert to 8-bit image (then range of values should
+        # be 0 -> max_disparity) but in fact is (-1 -> max_disparity - 1)
+        # so we fix this also using a initial threshold between 0 and max_disparity
+        # as disparity=-1 means no disparity available
+
+        _, disparity = cv2.threshold(disparity,0, max_disparity * 16, cv2.THRESH_TOZERO);
+        disparity_scaled = (disparity / 16.).astype(np.uint8);
+
+        # display disparity - which ** for display purposes only ** we re-scale to 0 ->255
+
+        if (apply_colourmap):
+
+            disparity_colour_mapped = cv2.applyColorMap((disparity_scaled * (256. / max_disparity)).astype(np.uint8), cv2.COLORMAP_HOT);
+            cv2.imshow(windowNameD, disparity_colour_mapped);
+        else:
+            cv2.imshow(windowNameD, (disparity_scaled * (256. / max_disparity)).astype(np.uint8));
+
+        # display input image
 
         cv2.imshow(windowName,frame);
 
@@ -184,6 +235,8 @@ if (zed_cam.isOpened()) :
 
         if (key == ord('x')):
             keep_processing = False;
+        elif (key == ord('c')):
+            apply_colourmap = not(apply_colourmap);
         elif (key == ord('f')):
             cv2.setWindowProperty(windowName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN);
         elif (key == ord(' ')):
@@ -224,9 +277,14 @@ if (zed_cam.isOpened()) :
             print("ZED mode: ", camera_mode);
             print();
 
+            # reset window sizes
+
             cv2.resizeWindow(windowName, width, height);
             cv2.resizeWindow(windowNameD, int(width/2), height);
 
+            # get calibration for new camera resolution
+
+            mapL1, mapL2, mapR1, mapR2 = zed_camera_calibration(cam_calibration, camera_mode, width, height);
 
     # close all windows
 
