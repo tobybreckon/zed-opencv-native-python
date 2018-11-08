@@ -130,6 +130,8 @@ if (zed_cam.isOpened()) :
     cv2.namedWindow(windowName, cv2.WINDOW_NORMAL);
     cv2.namedWindow(windowNameD, cv2.WINDOW_NORMAL);
 
+    # TODO - force window sizes to camera resolution
+
     # loop control flag
 
     keep_processing = True;
@@ -179,6 +181,8 @@ if (zed_cam.isOpened()) :
             keep_processing = False;
         elif (key == ord('f')):
             cv2.setWindowProperty(windowName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN);
+
+        # TODO - cycle camera resolutions
 
     # close all windows
 
