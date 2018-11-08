@@ -91,7 +91,7 @@ height,width, channels = frame.shape;
 # 720p 	60 	    2560 x 720      HD
 # WVGA 	100 	1344 x 376      VGA
 
-config_options_width = {4416: "2K", 3840: "FHD", 2560: "HD",calibration.py 1344: "VGA"};
+config_options_width = {4416: "2K", 3840: "FHD", 2560: "HD", 1344: "VGA"};
 config_options_height = {1242: "2K", 1080: "FHD", 720: "HD", 376: "VGA"};
 
 try:
