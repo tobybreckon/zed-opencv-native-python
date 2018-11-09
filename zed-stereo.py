@@ -74,10 +74,13 @@ cam_calibration.read(path_to_config_file);
 
 # define video capture object as a threaded video stream
 
-zed_cam = CameraVideoStream(src=args.camera_to_use).open()
+zed_cam = CameraVideoStream();
+zed_cam.open(args.camera_to_use);
 
 if (zed_cam.isOpened()):
     ret, frame = zed_cam.read();
+else:
+    print("Error - selected camera #", args.camera_to_use, " : not found.");
 
 height,width, channels = frame.shape;
 
