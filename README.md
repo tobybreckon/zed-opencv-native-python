@@ -12,7 +12,7 @@ All tested with [OpenCV](http://www.opencv.org) 3.x and Python 3.x.
 
 ### How to download and run:
 
-**First** - you need to know the serial number of the ZED stereo camera you are trying to use. To do so, you can use ZED Explorer tools (ZED SDK tools) and check the serial number on the top right of ZED Explorer window or alternatively each camera has a small label on the end of the USB lead with the serial number on it.
+_Firstly_, you need to know the serial number of the ZED stereo camera you are trying to use. To do so, you can use ZED Explorer tools (ZED SDK tools) and check the serial number on the top right of ZED Explorer window or alternatively each camera has a small label on the end of the USB lead with the serial number on it.
 
 
 Clone the repository and run as follows, with your camera serial number as ```SERIAL```:
@@ -42,7 +42,19 @@ optional arguments:
                         camera calibration configuration file
 ```
 
-Press the _"f"_ key to run disparity fullscreen, press  _"f"_ key to add colour map and _space_ to change camera resolution mode (press _"x"_ to exit).
+Press the _"f"_ key to run disparity fullscreen, press  _"c"_ key to add colour map and _space_ to change camera resolution mode (press _"x"_ to exit).
+
+---
+
+### Re-usable Exemplar Components:
+
+From a teaching and learning perspective, this codebase contains several re-usable exemplar elements that offer more general insight:
+
+- ```zed_calibration.py``` - an example of how to setup and perform camera calibration in OpenCV using per-existing manufacturer supplied calibration data (as opposed to performing manual calibration with a calibration target object such as a chessbpard as available in this example - [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py))
+
+- ```camera_stream.py``` - a re-usable threaded camera class, that is largely call compatible with the existing OpenCV VideoCapture class, designed to always deliver the latest frame from a single camera without buffering delays. _This code is not specific to stereo cameras or the ZED stereo camera_.
+
+- ```zed-cam-sn-1010.conf``` - an example of how parameters and settings can be stored in this simple INI file format (originating from MS Windows INI files) and read/parsed using functionality built into the Python standard library (see ```zed-stereo.py``` / ```zed_calibration.py```).
 
 ---
 
