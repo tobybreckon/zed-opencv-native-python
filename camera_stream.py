@@ -3,9 +3,9 @@
 # threaded frame capture from camera to avoid camera frame buffering delays
 # (always delivers the latest frame from the camera)
 
-# The MIT License (MIT)
 # Copyright (c) 2018 Toby Breckon, Durham University, UK
 # Copyright (c) 2015-2016 Adrian Rosebrock, http://www.pyimagesearch.com
+# MIT License (MIT)
 
 # based on code from this tutorial, with changes to make object method call compatible
 # with cv2.VideoCapture(src) as far as possible:
