@@ -42,7 +42,7 @@ if (args.serial > 0):
 
     r = requests.get(url+str(args.serial));
 
-    if (r.status_code == requests.codes.ok):
+    if ((r.status_code == requests.codes.ok) and not("ERROR" in r.text)):
 
         with open("zed-cam-sn-"+str(args.serial)+".conf", "w") as config_file:
             config_file.write(r.text[1:]); # write to file skipping first blank character
