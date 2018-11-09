@@ -83,7 +83,7 @@ def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
 
     # perform stereo calibration based on intrinsic and extrinic parameters
 
-    R1, R2, P1, P2, Q, roi1, roi2 = cv2.stereoRectify(K_CameraMatrix_left,distCoeffsL,K_CameraMatrix_right,distCoeffsR,size,R, T);
+    R1, R2, P1, P2, Q, roi1, roi2 = cv2.stereoRectify(K_CameraMatrix_left,distCoeffsL,K_CameraMatrix_right,distCoeffsR,size,R, T, flags=cv2.CALIB_ZERO_DISPARITY);
 
     # compute set of left and right pixel positions mapping from stereo calibration
 
