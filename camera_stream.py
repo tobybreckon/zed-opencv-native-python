@@ -86,6 +86,13 @@ class CameraVideoStream:
 		ret_val = self.camera.set(property_name, property_value)
 		self.camera.grab()
 
+		# whilst we are still suspended flush the frame buffer held inside
+		# the object by reading a new frame otherwise a race condition
+		# will exist between the thread's next call to update() after it
+		# un-suspends and the next call to read() by the object user
+
+		(self.grabbed, self.frame) = self.camera.read()
+
 		# restart thread by unsuspending it
 
 		self.suspend = False;
