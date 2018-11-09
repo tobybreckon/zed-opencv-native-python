@@ -61,8 +61,8 @@ From teaching and learning, this codebase contains several re-usable exemplar el
 ### References:
 
 If using this example in your own work (e.g _"... based on the implementation of REF..."_), please reference our related research work:
-- 
-[Generalized Dynamic Object Removal for Dense Stereo Vision Based Scene Mapping using Synthesised Optical Flow](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton16removal.pdf) (O.K. Hamilton, T.P. Breckon), In Proc. International Conference on Image Processing, IEEE, pp. 3439-3443, 2016. [[PDF]](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton16removal.pdf)
+
+- [Generalized Dynamic Object Removal for Dense Stereo Vision Based Scene Mapping using Synthesised Optical Flow](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton16removal.pdf) (O.K. Hamilton, T.P. Breckon), In Proc. International Conference on Image Processing, IEEE, pp. 3439-3443, 2016. [[PDF]](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton16removal.pdf)
 
 - [A Foreground Object based Quantitative Assessment of Dense Stereo Approaches for use in Automotive Environments](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton13stereo.pdf) (O.K. Hamilton, T.P. Breckon, X. Bai, S. Kamata), In Proc. International Conference on Image Processing, IEEE, pp. 418-422, 2013. [[pdf]](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton13stereo.pdf)
 
