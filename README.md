@@ -50,7 +50,7 @@ Press the _"f"_ key to run disparity fullscreen, press  _"c"_ key to add colour 
 
 From teaching and learning, this codebase contains several re-usable exemplar elements that offer more general insight:
 
-- ```zed_calibration.py``` - an example of how to setup and perform camera calibration in OpenCV using per-existing manufacturer supplied calibration data (as opposed to performing manual calibration with a calibration target object such as a chessboard as available in this example - [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py))
+- ```zed_calibration.py``` - an example of how to setup and perform camera calibration in OpenCV using pre-existing manufacturer supplied calibration data (as opposed to performing manual calibration with a calibration target object such as a chessboard as available in this example - [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py))
 
 - ```camera_stream.py``` - a re-usable threaded camera class, that is call compatible with the existing OpenCV VideoCapture class, designed to always deliver the latest frame from a single camera without buffering delays. _This code is not specific to stereo cameras or the ZED stereo camera_.
 
