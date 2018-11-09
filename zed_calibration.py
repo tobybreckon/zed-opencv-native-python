@@ -13,8 +13,16 @@ import numpy as np
 
 ################################################################################
 
-# perform zed stereo camera calibration based on camera calibration data read
+# read zed stereo camera calibration based on camera calibration data read
 # from manufacturer provided calibration file
+
+# return set of values
+# as (fx, fy, B, Kl,Kr) which are:
+# fx - lens focal length in x-axis
+# fy - lens focal length in x-axis
+# B - Baseline
+# Kl - camera matrix K for left camera
+# Kr - camera matrix R for right camera
 
 # parts based on:
 # https://github.com/stereolabs/zed-opencv-native/blob/master/include/calibration.hpp
@@ -77,20 +85,17 @@ def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
 
     T = np.array([[Baseline],[0],[0]]);
 
-    # compute image size
+    # depth image is registered against left image so return set of values
+    # as (fx, fy, B, Kl,Kr) which are:
+    # fx - lens focal length in x-axis
+    # fy - lens focal length in x-axis
+    # B - Baseline
+    # Kl - camera matrix K for left camera
+    # Kr - camera matrix R for right camera
 
-    size = (int(full_width/2),int(height));
+    # N.B.  ZED camera are pre-rectified
 
-    # perform stereo calibration based on intrinsic and extrinic parameters
-
-    R1, R2, P1, P2, Q, roi1, roi2 = cv2.stereoRectify(K_CameraMatrix_left,distCoeffsL,K_CameraMatrix_right,distCoeffsR,size,R, T, flags=cv2.CALIB_ZERO_DISPARITY);
-
-    # compute set of left and right pixel positions mapping from stereo calibration
-
-    map_left_x, map_left_y = cv2.initUndistortRectifyMap(K_CameraMatrix_left, distCoeffsL, R1, P1,size,cv2.CV_32F)
-    map_right_x, map_right_y = cv2.initUndistortRectifyMap(K_CameraMatrix_right, distCoeffsR, R2, P2,size,cv2.CV_32F)
-
-    return (map_left_x, map_left_y, map_right_x, map_right_y);
+    return Lfx, Lfy, Baseline, K_CameraMatrix_left, K_CameraMatrix_right, R, T;
 
 
 ################################################################################
