@@ -77,11 +77,9 @@ class CameraVideoStream:
 		# set a video capture property (behavior as per OpenCV manual for VideoCapture)
 
 		# first suspend thread
-
 		self.suspend = True;
 
 		# set value - wrapping it in grabs() so it takes effect
-
 		self.camera.grab()
 		ret_val = self.camera.set(property_name, property_value)
 		self.camera.grab()
@@ -90,11 +88,9 @@ class CameraVideoStream:
 		# the object by reading a new frame otherwise a race condition
 		# will exist between the thread's next call to update() after it
 		# un-suspends and the next call to read() by the object user
-
 		(self.grabbed, self.frame) = self.camera.read()
 
 		# restart thread by unsuspending it
-
 		self.suspend = False;
 
 		return ret_val;
