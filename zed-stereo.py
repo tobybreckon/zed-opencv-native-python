@@ -81,6 +81,7 @@ if (zed_cam.isOpened()):
     ret, frame = zed_cam.read();
 else:
     print("Error - selected camera #", args.camera_to_use, " : not found.");
+    exit(1);
 
 height,width, channels = frame.shape;
 
