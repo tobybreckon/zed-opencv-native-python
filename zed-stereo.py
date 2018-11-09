@@ -115,7 +115,7 @@ print();
 
 # process config to get camera calibration from calibration file
 
-mapL1, mapL2, mapR1, mapR2 = zed_camera_calibration(cam_calibration, camera_mode, width, height);
+fx, fy, B, Kl, Kr, R, T = zed_camera_calibration(cam_calibration, camera_mode, width, height);
 
 ################################################################################
 
@@ -195,28 +195,13 @@ if (zed_cam.isOpened()) :
         # perform preprocessing - raise to the power, as this subjectively appears
         # to improve subsequent disparity calculation
 
-        # grayL = np.power(grayL, 0.75).astype('uint8');
-        # grayR = np.power(grayR, 0.75).astype('uint8');
-
-        # undistort and rectify based on the mappings (could improve interpolation and image border settings here)
-        # N.B. mapping works independant of number of image channels
-
-        undistorted_rectifiedL = cv2.remap(grayL, mapL1, mapL2, cv2.INTER_LINEAR);
-        undistorted_rectifiedR = cv2.remap(grayR, mapR1, mapR2, cv2.INTER_LINEAR);
-
-        # for reasons unknown (probably buried in the calibration code), flip the image around the x-axis
-
-        undistorted_rectifiedL = cv2.flip(undistorted_rectifiedL, flipCode=0);
-        undistorted_rectifiedR = cv2.flip(undistorted_rectifiedR, flipCode=0);
-
-        if (display_undistored):
-            cv2.imshow("L undistorted", undistorted_rectifiedL);
-            cv2.imshow("R undistorted", undistorted_rectifiedR);
+        grayL = np.power(grayL, 0.75).astype('uint8');
+        grayR = np.power(grayR, 0.75).astype('uint8');
 
         # compute disparity image from undistorted and rectified versions
         # (which for reasons best known to the OpenCV developers is returned scaled by 16)
 
-        disparity = stereoProcessor.compute(undistorted_rectifiedL,undistorted_rectifiedR);
+        disparity = stereoProcessor.compute(grayL,grayR);
 
         # cv2.filterSpeckles(disparity, 0, 4000, max_disparity);
 
@@ -306,7 +291,7 @@ if (zed_cam.isOpened()) :
 
             # get calibration for new camera resolution
 
-            mapL1, mapL2, mapR1, mapR2 = zed_camera_calibration(cam_calibration, camera_mode, width, height);
+            fx, fy, B, Kl, Kr, R, T = zed_camera_calibration(cam_calibration, camera_mode, width, height);
 
     # close all windows and release camera
 
