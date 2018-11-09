@@ -188,6 +188,12 @@ if (zed_cam.isOpened()) :
         grayL = cv2.cvtColor(frameL,cv2.COLOR_BGR2GRAY);
         grayR = cv2.cvtColor(frameR,cv2.COLOR_BGR2GRAY);
 
+        # perform preprocessing - raise to the power, as this subjectively appears
+        # to improve subsequent disparity calculation
+
+        grayL = np.power(grayL, 0.75).astype('uint8');
+        grayR = np.power(grayR, 0.75).astype('uint8');
+
         # undistort and rectify based on the mappings (could improve interpolation and image border settings here)
         # N.B. mapping works independant of number of image channels
 
@@ -238,7 +244,7 @@ if (zed_cam.isOpened()) :
         elif (key == ord('c')):
             apply_colourmap = not(apply_colourmap);
         elif (key == ord('f')):
-            cv2.setWindowProperty(windowName, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN);
+            cv2.setWindowProperty(windowNameD, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN);
         elif (key == ord(' ')):
 
             # cycle camera resolutions to get the next one on the list
