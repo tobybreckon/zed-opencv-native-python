@@ -30,9 +30,14 @@ import numpy as np
 
 def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
 
-    left = camera_calibration['LEFT_CAM_'+camera_mode];
-    right = camera_calibration['RIGHT_CAM_'+camera_mode];
-    common = camera_calibration['STEREO'];
+    try:
+
+        left = camera_calibration['LEFT_CAM_'+camera_mode];
+        right = camera_calibration['RIGHT_CAM_'+camera_mode];
+        common = camera_calibration['STEREO'];
+    except:
+        print("Error -sepecified config file does not contain valid ZED config.");
+        exit(1);
 
     #[LEFT_CAM_xxx] - intrinsics
 
