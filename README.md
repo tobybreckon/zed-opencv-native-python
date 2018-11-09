@@ -48,11 +48,11 @@ Press the _"f"_ key to run disparity fullscreen, press  _"c"_ key to add colour 
 
 ### Re-usable Exemplar Components:
 
-From a teaching and learning perspective, this codebase contains several re-usable exemplar elements that offer more general insight:
+From teaching and learning, this codebase contains several re-usable exemplar elements that offer more general insight:
 
-- ```zed_calibration.py``` - an example of how to setup and perform camera calibration in OpenCV using per-existing manufacturer supplied calibration data (as opposed to performing manual calibration with a calibration target object such as a chessbpard as available in this example - [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py))
+- ```zed_calibration.py``` - an example of how to setup and perform camera calibration in OpenCV using per-existing manufacturer supplied calibration data (as opposed to performing manual calibration with a calibration target object such as a chessboard as available in this example - [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py))
 
-- ```camera_stream.py``` - a re-usable threaded camera class, that is largely call compatible with the existing OpenCV VideoCapture class, designed to always deliver the latest frame from a single camera without buffering delays. _This code is not specific to stereo cameras or the ZED stereo camera_.
+- ```camera_stream.py``` - a re-usable threaded camera class, that is call compatible with the existing OpenCV VideoCapture class, designed to always deliver the latest frame from a single camera without buffering delays. _This code is not specific to stereo cameras or the ZED stereo camera_.
 
 - ```zed-cam-sn-1010.conf``` - an example of how parameters and settings can be stored in this simple INI file format (originating from MS Windows INI files) and read/parsed using functionality built into the Python standard library (see ```zed-stereo.py``` / ```zed_calibration.py```).
 
@@ -60,7 +60,9 @@ From a teaching and learning perspective, this codebase contains several re-usab
 
 ### References:
 
-If using this example in your own work (e.g _"... based on the implementation of REF..."_), please reference the related research work from which this set of SGBM parameters where defined:
+If using this example in your own work (e.g _"... based on the implementation of REF..."_), please reference our related research work:
+- 
+[Generalized Dynamic Object Removal for Dense Stereo Vision Based Scene Mapping using Synthesised Optical Flow](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton16removal.pdf) (O.K. Hamilton, T.P. Breckon), In Proc. International Conference on Image Processing, IEEE, pp. 3439-3443, 2016. [[PDF]](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton16removal.pdf)
 
 - [A Foreground Object based Quantitative Assessment of Dense Stereo Approaches for use in Automotive Environments](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton13stereo.pdf) (O.K. Hamilton, T.P. Breckon, X. Bai, S. Kamata), In Proc. International Conference on Image Processing, IEEE, pp. 418-422, 2013. [[pdf]](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton13stereo.pdf)
 
