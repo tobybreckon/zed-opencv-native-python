@@ -1,12 +1,10 @@
 # Stereolabs ZED -  OpenCV Native Capture in Python
 
-This sample shows how to capture rectified images with the ZED (or ZED-M) Stereo Camera and OpenCV, **without the ZED SDK**, using only Python. It is inspired by the C++version of the same available from [stereolabs](https://github.com/stereolabs/zed-opencv-native).
+This sample shows how to capture rectified images with the StereoLabs ZED (or ZED-M) Stereo Camera and OpenCV, **without the ZED SDK**, using only Python. It is inspired by the C++version of the same available from [stereolabs](https://github.com/stereolabs/zed-opencv-native). As the images supplied from the ZED stereo camera are already rectified, we do not need to use the calibration to rectify the images further before performing the disparity calculation but the intrinsics and extrinsics (camera matrix _K_, focal length _f_, and baseline, _B_) are required for subsequent depth (distance) recovery.
 
 Alternatively, if you want to use OpenCV with the ZED SDK features, check our sample [here](https://github.com/stereolabs/zed-opencv).
 
-Developed to support teaching within the undergraduate Computer Science programme at [Durham University](http://www.durham.ac.uk) (UK) by [Prof. Toby Breckon](http://community.dur.ac.uk/toby.breckon/).
-
-All tested with [OpenCV](http://www.opencv.org) 3.x and Python 3.x.
+Developed to support teaching within the undergraduate Computer Science programme at [Durham University](http://www.durham.ac.uk) (UK) by [Prof. Toby Breckon](http://community.dur.ac.uk/toby.breckon/). All tested with [OpenCV](http://www.opencv.org) 3.x and Python 3.x.
 
 ---
 
@@ -23,9 +21,9 @@ cd zed-opencv-native-python
 python3 ./zed-stereo.py --serial SERIAL --camera_to_use 1
 ```
 
-Example will retrieve camera calibration from manufacturer's on-line calibration site and write to file as ``` zed-cam-sn-SERIA.conf```
+Example will retrieve camera calibration from manufacturer's on-line calibration site and write to file as ``` zed-cam-sn-SERIAL.conf```
 
-In general example can be used as follows:
+In general, this example can be used as follows:
 
 ```
 usage: zed-stereo.py [-h] [-c CAMERA_TO_USE] [-s SERIAL] [-cf CONFIG_FILE]
@@ -42,17 +40,21 @@ optional arguments:
                         camera calibration configuration file
 ```
 
-Press the _"f"_ key to run disparity fullscreen, press  _"c"_ key to add colour map and _space_ to change camera resolution mode (press _"x"_ to exit).
+Press the _"f"_ key to run disparity fullscreen, press  _"c"_ key to add colour map and _space_ to change camera resolution mode (press _"x"_ to exit). Changing between the resolutions does work when tested although sometimes does cause the camera image to freeze.
 
 ---
 
 ### Re-usable Exemplar Components:
 
-From a teaching and learning perspective, this codebase contains several re-usable exemplar elements that offer more general insight:
+From teaching and learning, this codebase contains several re-usable exemplar elements that offer more general insight:
 
+<<<<<<< HEAD
 - ```zed_calibration.py``` - an example of how to setup camera calibration parameters in OpenCV using per-existing manufacturer supplied calibration data (as opposed to performing manual calibration with a calibration target object such as a chessbpard as available in this example - [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py))
+=======
+- ```zed_calibration.py``` - an example of how to setup and perform camera calibration in OpenCV using per-existing manufacturer supplied calibration data (as opposed to performing manual calibration with a calibration target object such as a chessboard as available in this example - [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py))
+>>>>>>> fd68d57998c80928e8acfecd9d28be60997028a2
 
-- ```camera_stream.py``` - a re-usable threaded camera class, that is largely call compatible with the existing OpenCV VideoCapture class, designed to always deliver the latest frame from a single camera without buffering delays. _This code is not specific to stereo cameras or the ZED stereo camera_.
+- ```camera_stream.py``` - a re-usable threaded camera class, that is call compatible with the existing OpenCV VideoCapture class, designed to always deliver the latest frame from a single camera without buffering delays. _This code is not specific to stereo cameras or the ZED stereo camera_.
 
 - ```zed-cam-sn-1010.conf``` - an example of how parameters and settings can be stored in this simple INI file format (originating from MS Windows INI files) and read/parsed using functionality built into the Python standard library (see ```zed-stereo.py``` / ```zed_calibration.py```).
 
@@ -60,7 +62,9 @@ From a teaching and learning perspective, this codebase contains several re-usab
 
 ### References:
 
-If using this example in your own work (e.g _"... based on the implementation of REF..."_), please reference the related research work from which this set of SGBM parameters where defined:
+If using this example in your own work (e.g _"... based on the implementation of REF..."_), please reference our related research work:
+
+- [Generalized Dynamic Object Removal for Dense Stereo Vision Based Scene Mapping using Synthesised Optical Flow](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton16removal.pdf) (O.K. Hamilton, T.P. Breckon), In Proc. International Conference on Image Processing, IEEE, pp. 3439-3443, 2016. [[pdf]](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton16removal.pdf)
 
 - [A Foreground Object based Quantitative Assessment of Dense Stereo Approaches for use in Automotive Environments](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton13stereo.pdf) (O.K. Hamilton, T.P. Breckon, X. Bai, S. Kamata), In Proc. International Conference on Image Processing, IEEE, pp. 418-422, 2013. [[pdf]](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton13stereo.pdf)
 
