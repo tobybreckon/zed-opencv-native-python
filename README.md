@@ -23,9 +23,9 @@ cd zed-opencv-native-python
 python3 ./zed-stereo.py --serial SERIAL --camera_to_use 1
 ```
 
-Example will retrieve camera calibration from manufacturer's on-line calibration site and write to file as ``` zed-cam-sn-SERIA.conf```
+Example will retrieve camera calibration from manufacturer's on-line calibration site and write to file as ``` zed-cam-sn-SERIAL.conf```
 
-In general example can be used as follows:
+In general, this example can be used as follows:
 
 ```
 usage: zed-stereo.py [-h] [-c CAMERA_TO_USE] [-s SERIAL] [-cf CONFIG_FILE]
@@ -42,7 +42,7 @@ optional arguments:
                         camera calibration configuration file
 ```
 
-Press the _"f"_ key to run disparity fullscreen, press  _"c"_ key to add colour map and _space_ to change camera resolution mode (press _"x"_ to exit).
+Press the _"f"_ key to run disparity fullscreen, press  _"c"_ key to add colour map and _space_ to change camera resolution mode (press _"x"_ to exit). Changing between the resolutions does work when tested although sometimes does cause the camera image to freeze.
 
 ---
 
