@@ -1,5 +1,7 @@
 # Stereolabs ZED -  OpenCV Native Capture in Python
 
+![alt text](https://raw.githubusercontent.com/apennisi/ZedCameraGrabber/master/images/zed.jpg)
+
 This sample shows how to capture rectified images with the StereoLabs ZED (or ZED-M) Stereo Camera and OpenCV, **without the ZED SDK**, using only Python. It is inspired by the C++version of the same available from [stereolabs](https://github.com/stereolabs/zed-opencv-native). As the images supplied from the ZED stereo camera are already rectified, we do not need to use the calibration to rectify the images further before performing the disparity calculation but the intrinsics and extrinsics (camera matrix _K_, focal length _f_, and baseline, _B_) are required for subsequent depth (distance) recovery.
 
 Alternatively, if you want to use OpenCV with the ZED SDK features, check our sample [here](https://github.com/stereolabs/zed-opencv).
@@ -48,11 +50,7 @@ Press the _"f"_ key to run disparity fullscreen, press  _"c"_ key to add colour 
 
 From teaching and learning, this codebase contains several re-usable exemplar elements that offer more general insight:
 
-<<<<<<< HEAD
-- ```zed_calibration.py``` - an example of how to setup camera calibration parameters in OpenCV using per-existing manufacturer supplied calibration data (as opposed to performing manual calibration with a calibration target object such as a chessbpard as available in this example - [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py))
-=======
 - ```zed_calibration.py``` - an example of how to setup and perform camera calibration in OpenCV using per-existing manufacturer supplied calibration data (as opposed to performing manual calibration with a calibration target object such as a chessboard as available in this example - [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py))
->>>>>>> fd68d57998c80928e8acfecd9d28be60997028a2
 
 - ```camera_stream.py``` - a re-usable threaded camera class, that is call compatible with the existing OpenCV VideoCapture class, designed to always deliver the latest frame from a single camera without buffering delays. _This code is not specific to stereo cameras or the ZED stereo camera_.
 
