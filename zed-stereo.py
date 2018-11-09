@@ -159,10 +159,11 @@ if (zed_cam.isOpened()) :
     cv2.namedWindow(windowNameD, cv2.WINDOW_NORMAL);
     cv2.resizeWindow(windowNameD, int(width/2), height);
 
-    # loop control flag
+    # loop control flags
 
     keep_processing = True;
     apply_colourmap = False;
+    display_undistored = False;
 
     while (keep_processing):
 
@@ -194,8 +195,8 @@ if (zed_cam.isOpened()) :
         # perform preprocessing - raise to the power, as this subjectively appears
         # to improve subsequent disparity calculation
 
-        grayL = np.power(grayL, 0.75).astype('uint8');
-        grayR = np.power(grayR, 0.75).astype('uint8');
+        # grayL = np.power(grayL, 0.75).astype('uint8');
+        # grayR = np.power(grayR, 0.75).astype('uint8');
 
         # undistort and rectify based on the mappings (could improve interpolation and image border settings here)
         # N.B. mapping works independant of number of image channels
@@ -203,11 +204,21 @@ if (zed_cam.isOpened()) :
         undistorted_rectifiedL = cv2.remap(grayL, mapL1, mapL2, cv2.INTER_LINEAR);
         undistorted_rectifiedR = cv2.remap(grayR, mapR1, mapR2, cv2.INTER_LINEAR);
 
+        # for reasons unknown (probably buried in the calibration code), flip the image around the x-axis
+
+        undistorted_rectifiedL = cv2.flip(undistorted_rectifiedL, flipCode=0);
+        undistorted_rectifiedR = cv2.flip(undistorted_rectifiedR, flipCode=0);
+
+        if (display_undistored):
+            cv2.imshow("L undistorted", undistorted_rectifiedL);
+            cv2.imshow("R undistorted", undistorted_rectifiedR);
+
         # compute disparity image from undistorted and rectified versions
         # (which for reasons best known to the OpenCV developers is returned scaled by 16)
 
         disparity = stereoProcessor.compute(undistorted_rectifiedL,undistorted_rectifiedR);
-        cv2.filterSpeckles(disparity, 0, 4000, max_disparity);
+
+        # cv2.filterSpeckles(disparity, 0, 4000, max_disparity);
 
         # scale the disparity to 8-bit for viewing
         # divide by 16 and convert to 8-bit image (then range of values should
@@ -246,6 +257,8 @@ if (zed_cam.isOpened()) :
             keep_processing = False;
         elif (key == ord('c')):
             apply_colourmap = not(apply_colourmap);
+        elif (key == ord('u')):
+            display_undistored = not(display_undistored);
         elif (key == ord('f')):
             cv2.setWindowProperty(windowNameD, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN);
         elif (key == ord(' ')):
