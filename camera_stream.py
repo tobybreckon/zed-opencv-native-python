@@ -21,11 +21,7 @@ import cv2
 ################################################################################
 
 class CameraVideoStream:
-	def __init__(self, src=0, name="CameraVideoStream"):
-		# initialize the video camera stream and read the first frame
-		# from the stream
-		self.camera = cv2.VideoCapture(src)
-		(self.grabbed, self.frame) = self.camera.read()
+	def __init__(self, name="CameraVideoStream"):
 
 		# initialize the thread name
 		self.name = name
@@ -35,7 +31,16 @@ class CameraVideoStream:
 		self.stopped = False
 		self.suspend = False
 
-	def open(self):
+		# set these to null values initially
+		self.grabbed = 0;
+		self.frame = None;
+
+	def open(self, src=0):
+		# initialize the video camera stream and read the first frame
+		# from the stream
+		self.camera = cv2.VideoCapture(src)
+		(self.grabbed, self.frame) = self.camera.read()
+
 		# start the thread to read frames from the video stream
 		t = Thread(target=self.update, name=self.name, args=())
 		t.daemon = True
