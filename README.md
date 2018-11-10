@@ -12,7 +12,7 @@ Developed to support teaching within the undergraduate Computer Science programm
 
 ### How to download and run:
 
-_Firstly_, you need to know the serial number of the ZED stereo camera you are trying to use. To do so, you can use ZED Explorer tools (ZED SDK tools) and check the serial number on the top right of ZED Explorer window or alternatively each camera has a small label on the end of the USB lead with the serial number on it.
+_Firstly_, you ideally need to know the serial number of the ZED stereo camera you are trying to use. To do so, you can use ZED Explorer tools (ZED SDK tools) and check the serial number on the top right of ZED Explorer window or alternatively each camera has a small label on the end of the USB lead with the serial number on it.
 
 
 Clone the repository and run as follows, with your camera serial number as ```SERIAL```:
@@ -29,6 +29,7 @@ In general, this example can be used as follows:
 
 ```
 usage: zed-stereo.py [-h] [-c CAMERA_TO_USE] [-s SERIAL] [-cf CONFIG_FILE]
+                     [-fs] [-cm] [-hs] [-vs]
 
 Native live stereo from a StereoLabs ZED camera using factory calibration.
 
@@ -45,7 +46,7 @@ optional arguments:
   -hs, --sidebysideh    display left image and disparity side by side
                         horizontally (stacked)
   -vs, --sidebysidev    display left image and disparity top to bottom
-                        vertically (stacked)  
+                        vertically (stacked)
 ```
 
 Press the _"f"_ key to toggle disparity fullscreen, _"h/v"_ to toggle horizontal/vertical stacking, press  _"c"_ key to toggle disparity colour map and _space_ to change camera resolution mode (press _"x"_ to exit). Changing between the resolutions worked when tested although it appears it does cause the camera image to freeze sometimes.
@@ -59,6 +60,8 @@ From teaching and learning, this codebase contains several re-usable exemplar el
 - ```zed_calibration.py``` - an example of how to setup and perform camera calibration in OpenCV using pre-existing manufacturer supplied calibration data (as opposed to performing manual calibration with a calibration target object such as a chessboard as available in this example - [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py))
 
 - ```camera_stream.py``` - a re-usable threaded camera class, that is call compatible with the existing OpenCV VideoCapture class, designed to always deliver the latest frame from a single camera without buffering delays. _This code is not specific to stereo cameras or the ZED stereo camera_.
+
+- ```utils.py``` - functions ```h_concatenate()``` and ```v_concatenate()``` perform horizontal/vertical OpenCV image stacking for then displaying several images in a single common window.
 
 - ```zed-cam-sn-1010.conf``` - an example of how parameters and settings can be stored in this simple INI file format (originating from MS Windows INI files) and read/parsed using functionality built into the Python standard library (see ```zed-stereo.py``` / ```zed_calibration.py```).
 
