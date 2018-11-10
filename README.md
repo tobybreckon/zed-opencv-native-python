@@ -55,7 +55,7 @@ Press the _"f"_ key to toggle disparity fullscreen, _"h/v"_ to toggle horizontal
 
 ### Re-usable Exemplar Components:
 
-From teaching and learning, this codebase contains several re-usable exemplar elements that offer more general insight:
+For teaching and learning, this codebase contains several re-usable exemplar elements that offer more general insight:
 
 - ```zed_calibration.py``` - an example of how to setup and perform camera calibration in OpenCV using pre-existing manufacturer supplied calibration data (as opposed to performing manual calibration with a calibration target object such as a chessboard as available in this example - [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py))
 
