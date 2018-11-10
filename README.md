@@ -42,9 +42,13 @@ optional arguments:
                         camera calibration configuration file
   -fs, --fullscreen     run disparity full screen mode
   -cm, --colourmap      apply disparity false colour display
+  -hs, --sidebysideh    display left image and disparity side by side
+                        horizontally (stacked)
+  -vs, --sidebysidev    display left image and disparity top to bottom
+                        vertically (stacked)  
 ```
 
-Press the _"f"_ key to run disparity fullscreen, press  _"c"_ key to add colour map and _space_ to change camera resolution mode (press _"x"_ to exit). Changing between the resolutions does work when tested although sometimes does cause the camera image to freeze.
+Press the _"f"_ key to toggle disparity fullscreen, _"h/v"_ to toggle horizontal/vertical stacking, press  _"c"_ key to toggle disparity colour map and _space_ to change camera resolution mode (press _"x"_ to exit). Changing between the resolutions worked when tested although it appears it does cause the camera image to freeze sometimes.
 
 ---
 

@@ -30,6 +30,8 @@ parser.add_argument("-s", "--serial", type=int, help="camera serial number", def
 parser.add_argument("-cf", "--config_file", type=str, help="camera calibration configuration file", default='');
 parser.add_argument("-fs", "--fullscreen", action='store_true', help="run disparity full screen mode");
 parser.add_argument("-cm", "--colourmap", action='store_true', help="apply disparity false colour display");
+parser.add_argument("-hs", "--sidebysideh", action='store_true', help="display left image and disparity side by side horizontally (stacked)");
+parser.add_argument("-vs", "--sidebysidev", action='store_true', help="display left image and disparity top to bottom vertically (stacked)");
 
 args = parser.parse_args()
 
@@ -173,8 +175,6 @@ if (zed_cam.isOpened()) :
     # loop control flags
 
     keep_processing = True;
-    apply_colourmap = args.colourmap;
-    fullscreen = args.fullscreen;
 
     while (keep_processing):
 
@@ -227,18 +227,23 @@ if (zed_cam.isOpened()) :
 
         # display disparity - which ** for display purposes only ** we re-scale to 0 ->255
 
-        if (apply_colourmap):
-
-            disparity_colour_mapped = cv2.applyColorMap((disparity_scaled * (256. / max_disparity)).astype(np.uint8), cv2.COLORMAP_HOT);
-            cv2.imshow(windowNameD, disparity_colour_mapped);
+        if (args.colourmap):
+            disparity_to_display = cv2.applyColorMap((disparity_scaled * (256. / max_disparity)).astype(np.uint8), cv2.COLORMAP_HOT);
         else:
-            cv2.imshow(windowNameD, (disparity_scaled * (256. / max_disparity)).astype(np.uint8));
+            disparity_to_display = (disparity_scaled * (256. / max_disparity)).astype(np.uint8);
+
+        if (args.sidebysideh):
+            disparity_to_display = h_concatenate(frameL, disparity_to_display);
+        elif (args.sidebysidev):
+            disparity_to_display = v_concatenate(frameL, disparity_to_display);
+
+        cv2.imshow(windowNameD, disparity_to_display);
 
         # switch between fullscreen and small - as required
 
-        cv2.setWindowProperty(windowNameD, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN & fullscreen);
+        cv2.setWindowProperty(windowNameD, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN & args.fullscreen);
 
-        # display input image
+        # display input image (combined left and right)
 
         cv2.imshow(windowName,frame);
 
@@ -256,11 +261,15 @@ if (zed_cam.isOpened()) :
         if (key == ord('x')):
             keep_processing = False;
         elif (key == ord('c')):
-            apply_colourmap = not(apply_colourmap);
+            args.colourmap = not(args.colourmap);
         elif (key == ord('u')):
             display_undistored = not(display_undistored);
         elif (key == ord('f')):
-            fullscreen = not(fullscreen);
+            args.fullscreen = not(args.fullscreen);
+        elif (key == ord('h')):
+            args.sidebysideh = not(args.sidebysideh);
+        elif (key == ord('v')):
+            args.sidebysidev = not(args.sidebysidev);
         elif (key == ord(' ')):
 
             # cycle camera resolutions to get the next one on the list
