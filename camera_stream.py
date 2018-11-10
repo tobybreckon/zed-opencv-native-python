@@ -52,6 +52,8 @@ class CameraVideoStream:
 		while True:
 			# if the thread indicator variable is set, stop the thread
 			if self.stopped:
+				self.grabbed = 0; # set flag to ensure isOpen() returns False
+				self.camera.release(); # cleanly release camera hardware
 				return
 
 			# otherwise, read the next frame from the stream
@@ -71,7 +73,6 @@ class CameraVideoStream:
 	def release(self):
 		# indicate that the thread should be stopped
 		self.stopped = True
-		self.camera.release(); # cleanly release camera hardware
 
 	def set(self, property_name, property_value):
 		# set a video capture property (behavior as per OpenCV manual for VideoCapture)
