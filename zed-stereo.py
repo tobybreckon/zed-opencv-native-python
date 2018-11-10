@@ -18,6 +18,7 @@ import configparser
 
 from camera_stream import *
 from zed_calibration import *
+from utils import *
 
 ################################################################################
 
@@ -27,12 +28,16 @@ parser = argparse.ArgumentParser(description='Native live stereo from a StereoLa
 parser.add_argument("-c", "--camera_to_use", type=int, help="specify camera to use", default=0);
 parser.add_argument("-s", "--serial", type=int, help="camera serial number", default=0);
 parser.add_argument("-cf", "--config_file", type=str, help="camera calibration configuration file", default='');
+parser.add_argument("-fs", "--fullscreen", action='store_true', help="run disparity full screen mode");
+parser.add_argument("-cm", "--colourmap", action='store_true', help="apply disparity false colour display");
 
 args = parser.parse_args()
 
 ################################################################################
 
-# process agruments to get camera config
+# process agruments to get camera calibration
+
+camera_calibration_available = False;
 
 if (args.serial > 0):
 
@@ -55,20 +60,24 @@ if (args.serial > 0):
         parser.print_help();
         exit(1);
 
+    camera_calibration_available = True;
+
 elif (len(args.config_file) > 0):
 
     path_to_config_file = args.config_file;
+    camera_calibration_available = True;
 
 else:
-    print("Error - no serial number or config file specified.");
+    print("Warning - no serial number or config file specified.");
     print();
-    exit(1);
+
 ################################################################################
 
 # parse camera configuration as an INI format file
 
-cam_calibration = configparser.ConfigParser();
-cam_calibration.read(path_to_config_file);
+if (camera_calibration_available):
+    cam_calibration = configparser.ConfigParser();
+    cam_calibration.read(path_to_config_file);
 
 ################################################################################
 
@@ -116,7 +125,8 @@ print();
 
 # process config to get camera calibration from calibration file
 
-fx, fy, B, Kl, Kr, R, T = zed_camera_calibration(cam_calibration, camera_mode, width, height);
+if (camera_calibration_available):
+    fx, fy, B, Kl, Kr, R, T = zed_camera_calibration(cam_calibration, camera_mode, width, height);
 
 ################################################################################
 
@@ -163,8 +173,8 @@ if (zed_cam.isOpened()) :
     # loop control flags
 
     keep_processing = True;
-    apply_colourmap = False;
-    display_undistored = False;
+    apply_colourmap = args.colourmap;
+    fullscreen = args.fullscreen;
 
     while (keep_processing):
 
@@ -224,6 +234,10 @@ if (zed_cam.isOpened()) :
         else:
             cv2.imshow(windowNameD, (disparity_scaled * (256. / max_disparity)).astype(np.uint8));
 
+        # switch between fullscreen and small - as required
+
+        cv2.setWindowProperty(windowNameD, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN & fullscreen);
+
         # display input image
 
         cv2.imshow(windowName,frame);
@@ -246,7 +260,7 @@ if (zed_cam.isOpened()) :
         elif (key == ord('u')):
             display_undistored = not(display_undistored);
         elif (key == ord('f')):
-            cv2.setWindowProperty(windowNameD, cv2.WND_PROP_FULLSCREEN, cv2.WINDOW_FULLSCREEN);
+            fullscreen = not(fullscreen);
         elif (key == ord(' ')):
 
             # cycle camera resolutions to get the next one on the list

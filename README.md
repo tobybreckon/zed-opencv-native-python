@@ -40,6 +40,8 @@ optional arguments:
                         camera serial number
   -cf CONFIG_FILE, --config_file CONFIG_FILE
                         camera calibration configuration file
+  -fs, --fullscreen     run disparity full screen mode
+  -cm, --colourmap      apply disparity false colour display
 ```
 
 Press the _"f"_ key to run disparity fullscreen, press  _"c"_ key to add colour map and _space_ to change camera resolution mode (press _"x"_ to exit). Changing between the resolutions does work when tested although sometimes does cause the camera image to freeze.
