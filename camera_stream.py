@@ -45,7 +45,7 @@ class CameraVideoStream:
 		t = Thread(target=self.update, name=self.name, args=())
 		t.daemon = True
 		t.start()
-		return self
+		return (self.grabbed > 0);
 
 	def update(self):
 		# keep looping infinitely until the thread is stopped
