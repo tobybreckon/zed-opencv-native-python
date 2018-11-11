@@ -53,7 +53,7 @@ parser.add_argument("-s", "--serial", type=int, help="camera serial number", def
 parser.add_argument("-cf", "--config_file", type=str, help="camera calibration configuration file", default='');
 parser.add_argument("-fix", "--correct_focal_length", action='store_true', help="correct for error in VGA factory supplied focal lengths");
 parser.add_argument("-fs", "--fullscreen", action='store_true', help="run disparity full screen mode");
-parser.add_argument("-scd",  "--showcentredepth", action='store_true', help="display cross-hairs target and depth from centre of image");
+parser.add_argument("-t",  "--showcentredepth", action='store_true', help="display cross-hairs target and depth from centre of image");
 parser.add_argument("-cm", "--colourmap", action='store_true', help="apply disparity false colour display");
 parser.add_argument("-hs", "--sidebysideh", action='store_true', help="display left image and disparity side by side horizontally (stacked)");
 parser.add_argument("-vs", "--sidebysidev", action='store_true', help="display left image and disparity top to bottom vertically (stacked)");
@@ -152,7 +152,7 @@ print("Controls:");
 print("space \t - change camera mode");
 print("f \t - toggle disparity full-screen mode");
 print("c \t - toggle disparity false colour mapping");
-print("s \t - toggle display of centre cross-hairs and depth");
+print("t \t - toggle display centre target cross-hairs and depth");
 print("h \t - toogle horizontal side by side [left image | disparity]");
 print("v \t - toogle vertical side by side [left image | disparity]");
 print("x \t - exit");
@@ -284,6 +284,10 @@ if (zed_cam.isOpened()) :
                 (int(width / 4) + 20, int(height / 2)), (255, 255, 255), 2);
             cv2.line(disparity_to_display, (int(width / 4), int(height / 2) - 20),
                 (int(width / 4), int(height / 2) + 20), (255, 255, 255), 2);
+            cv2.line(frameL, (int(width / 4) - 20, int(height / 2)),
+                (int(width / 4) + 20, int(height / 2)), (255, 255, 255), 2);
+            cv2.line(frameL, (int(width / 4), int(height / 2) - 20),
+                (int(width / 4), int(height / 2) + 20), (255, 255, 255), 2);
             if (disparity_scaled[int(height / 2), int(width / 4)]):
                 depth = fx * (B / disparity_scaled[int(height / 2), int(width / 4)]);
                 label = '{0:.3f}'.format(depth / 1000) + 'm';
@@ -323,7 +327,7 @@ if (zed_cam.isOpened()) :
             args.colourmap = not(args.colourmap);
         elif (key == ord('f')):
             args.fullscreen = not(args.fullscreen);
-        elif (key == ord('s')):
+        elif (key == ord('t')):
             args.showcentredepth = not(args.showcentredepth);
         elif (key == ord('h')):
             args.sidebysideh = not(args.sidebysideh);
