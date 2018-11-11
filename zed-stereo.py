@@ -148,13 +148,13 @@ print();
 print("ZED left/right resolution: ", int(width/2), " x ",  int(height));
 print("ZED mode: ", camera_mode);
 print();
-print("Controls:");
+print("Keyboard Controls:");
 print("space \t - change camera mode");
 print("f \t - toggle disparity full-screen mode");
 print("c \t - toggle disparity false colour mapping");
 print("t \t - toggle display centre target cross-hairs and depth");
-print("h \t - toogle horizontal side by side [left image | disparity]");
-print("v \t - toogle vertical side by side [left image | disparity]");
+print("h \t - toggle horizontal side by side [left image | disparity]");
+print("v \t - toggle vertical side by side [left image | disparity]");
 print("x \t - exit");
 print();
 
