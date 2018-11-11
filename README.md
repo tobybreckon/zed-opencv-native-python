@@ -29,7 +29,7 @@ In general, this example can be used as follows:
 
 ```
 usage: zed-stereo.py [-h] [-c CAMERA_TO_USE] [-s SERIAL] [-cf CONFIG_FILE]
-                     [-fs] [-cm] [-hs] [-vs]
+                     [-fix] [-fs] [-cm] [-hs] [-vs]
 
 Native live stereo from a StereoLabs ZED camera using factory calibration.
 
@@ -41,6 +41,9 @@ optional arguments:
                         camera serial number
   -cf CONFIG_FILE, --config_file CONFIG_FILE
                         camera calibration configuration file
+  -fix, --correct_focal_length
+                        correct for error in VGA factory supplied focal
+                        lengths
   -fs, --fullscreen     run disparity full screen mode
   -cm, --colourmap      apply disparity false colour display
   -hs, --sidebysideh    display left image and disparity side by side
@@ -49,7 +52,7 @@ optional arguments:
                         vertically (stacked)
 ```
 
-Press the _"f"_ key to toggle disparity fullscreen, _"h/v"_ to toggle horizontal/vertical stacking, press  _"c"_ key to toggle disparity colour map and _space_ to change camera resolution mode (press _"x"_ to exit). Changing between the resolutions worked when tested although it appears it does cause the camera image to freeze sometimes.
+Press the _"f"_ key to toggle disparity fullscreen, _"h/v"_ to toggle horizontal/vertical stacking, press  _"c"_ key to toggle disparity colour map and _space_ to change camera resolution mode (press _"x"_ to exit). Left click mouse in disparity image to print depth value at that point (beware that depth values in VGA mode maybe wrong unless ```-fix``` option is used). Changing between the resolutions worked when tested although it appears it does cause the camera image to freeze sometimes.
 
 ---
 
