@@ -22,12 +22,38 @@ from utils import *
 
 ################################################################################
 
+# mouse call back routine to display depth value at selected point
+
+def on_mouse_display_depth_value(event, x, y, flags, params):
+
+    # when the left mouse button has been clicked
+
+    if event == cv2.EVENT_LBUTTONDOWN:
+
+        # unpack the set of parameters
+
+        f, B = params;
+
+        # calculate the depth and display it in the terminal
+
+        depth = f * (B / disparity_scaled[y,x]);
+
+        print(disparity_scaled[y,x]);
+
+        # as the calibration for the ZED camera is in millimetres, divide
+        # by 1000 to get it in metres
+
+        print("depth @ (" + str(x) + "," + str(y) + "): " + '{0:.3f}'.format(depth / 1000) + "m");
+
+################################################################################
+
 # parse command line arguments for camera ID and config
 
 parser = argparse.ArgumentParser(description='Native live stereo from a StereoLabs ZED camera using factory calibration.');
 parser.add_argument("-c", "--camera_to_use", type=int, help="specify camera to use", default=0);
 parser.add_argument("-s", "--serial", type=int, help="camera serial number", default=0);
 parser.add_argument("-cf", "--config_file", type=str, help="camera calibration configuration file", default='');
+parser.add_argument("-fix", "--correct_focal_length", action='store_true', help="correct for error in VGA factory supplied focal lengths");
 parser.add_argument("-fs", "--fullscreen", action='store_true', help="run disparity full screen mode");
 parser.add_argument("-cm", "--colourmap", action='store_true', help="apply disparity false colour display");
 parser.add_argument("-hs", "--sidebysideh", action='store_true', help="display left image and disparity side by side horizontally (stacked)");
@@ -129,6 +155,10 @@ print();
 
 if (camera_calibration_available):
     fx, fy, B, Kl, Kr, R, T = zed_camera_calibration(cam_calibration, camera_mode, width, height);
+    if ((args.correct_focal_length) and (camera_mode == "VGA")):
+        fx = fx / 2.0;
+        fy = fy / 2.0;
+
 
 ################################################################################
 
@@ -171,6 +201,12 @@ if (zed_cam.isOpened()) :
 
     cv2.namedWindow(windowNameD, cv2.WINDOW_NORMAL);
     cv2.resizeWindow(windowNameD, int(width/2), height);
+
+    # if calibration is available then set call back to allow for depth display
+    # on left mouse button click
+
+    if (camera_calibration_available):
+        cv2.setMouseCallback(windowNameD,on_mouse_display_depth_value, (fx, B));
 
     # loop control flags
 
