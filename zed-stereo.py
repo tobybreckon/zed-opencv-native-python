@@ -146,7 +146,14 @@ except KeyError:
 print();
 print("ZED left/right resolution: ", int(width/2), " x ",  int(height));
 print("ZED mode: ", camera_mode);
-print("Press <space> to change camera mode");
+print();
+print("Controls:");
+print("space \t - change camera mode");
+print("f \t - toogle disparity full-screen mode");
+print("c \t - toogle disparity false colour mapping");
+print("h \t - toogle horizontal side by side [left image | disparity]");
+print("v \t - toogle vertical side by side [left image | disparity]");
+print("x \t - exit");
 print();
 
 ################################################################################
@@ -298,8 +305,6 @@ if (zed_cam.isOpened()) :
             keep_processing = False;
         elif (key == ord('c')):
             args.colourmap = not(args.colourmap);
-        elif (key == ord('u')):
-            display_undistored = not(display_undistored);
         elif (key == ord('f')):
             args.fullscreen = not(args.fullscreen);
         elif (key == ord('h')):
