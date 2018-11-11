@@ -38,8 +38,6 @@ def on_mouse_display_depth_value(event, x, y, flags, params):
 
         depth = f * (B / disparity_scaled[y,x]);
 
-        print(disparity_scaled[y,x]);
-
         # as the calibration for the ZED camera is in millimetres, divide
         # by 1000 to get it in metres
 
@@ -55,9 +53,12 @@ parser.add_argument("-s", "--serial", type=int, help="camera serial number", def
 parser.add_argument("-cf", "--config_file", type=str, help="camera calibration configuration file", default='');
 parser.add_argument("-fix", "--correct_focal_length", action='store_true', help="correct for error in VGA factory supplied focal lengths");
 parser.add_argument("-fs", "--fullscreen", action='store_true', help="run disparity full screen mode");
+parser.add_argument("-scd",  "--showcentredepth", action='store_true', help="display cross-hairs target and depth from centre of image");
 parser.add_argument("-cm", "--colourmap", action='store_true', help="apply disparity false colour display");
 parser.add_argument("-hs", "--sidebysideh", action='store_true', help="display left image and disparity side by side horizontally (stacked)");
 parser.add_argument("-vs", "--sidebysidev", action='store_true', help="display left image and disparity top to bottom vertically (stacked)");
+
+
 
 args = parser.parse_args()
 
@@ -149,8 +150,9 @@ print("ZED mode: ", camera_mode);
 print();
 print("Controls:");
 print("space \t - change camera mode");
-print("f \t - toogle disparity full-screen mode");
-print("c \t - toogle disparity false colour mapping");
+print("f \t - toggle disparity full-screen mode");
+print("c \t - toggle disparity false colour mapping");
+print("s \t - toggle display of centre cross-hairs and depth");
 print("h \t - toogle horizontal side by side [left image | disparity]");
 print("v \t - toogle vertical side by side [left image | disparity]");
 print("x \t - exit");
@@ -275,6 +277,20 @@ if (zed_cam.isOpened()) :
         else:
             disparity_to_display = (disparity_scaled * (256. / max_disparity)).astype(np.uint8);
 
+        # if requested draw target and display depth from centre of image
+
+        if (args.showcentredepth):
+            cv2.line(disparity_to_display, (int(width / 4) - 20, int(height / 2)),
+                (int(width / 4) + 20, int(height / 2)), (255, 255, 255), 2);
+            cv2.line(disparity_to_display, (int(width / 4), int(height / 2) - 20),
+                (int(width / 4), int(height / 2) + 20), (255, 255, 255), 2);
+            if (disparity_scaled[int(height / 2), int(width / 4)]):
+                depth = fx * (B / disparity_scaled[int(height / 2), int(width / 4)]);
+                label = '{0:.3f}'.format(depth / 1000) + 'm';
+                cv2.putText(disparity_to_display, label,(30,30), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+
+        # display side-by-side with left image as required
+
         if (args.sidebysideh):
             disparity_to_display = h_concatenate(frameL, disparity_to_display);
         elif (args.sidebysidev):
@@ -307,6 +323,8 @@ if (zed_cam.isOpened()) :
             args.colourmap = not(args.colourmap);
         elif (key == ord('f')):
             args.fullscreen = not(args.fullscreen);
+        elif (key == ord('s')):
+            args.showcentredepth = not(args.showcentredepth);
         elif (key == ord('h')):
             args.sidebysideh = not(args.sidebysideh);
         elif (key == ord('v')):
@@ -358,9 +376,7 @@ if (zed_cam.isOpened()) :
 
             fx, fy, B, Kl, Kr, R, T = zed_camera_calibration(cam_calibration, camera_mode, width, height);
 
-    # close all windows and release camera
-
-    cv2.destroyAllWindows()
+    # release camera
 
     zed_cam.release();
 
