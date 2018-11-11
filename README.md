@@ -29,7 +29,7 @@ In general, this example can be used as follows:
 
 ```
 usage: zed-stereo.py [-h] [-c CAMERA_TO_USE] [-s SERIAL] [-cf CONFIG_FILE]
-                     [-fix] [-fs] [-cm] [-hs] [-vs]
+                     [-fix] [-fs] [-t] [-cm] [-hs] [-vs]
 
 Native live stereo from a StereoLabs ZED camera using factory calibration.
 
@@ -45,6 +45,9 @@ optional arguments:
                         correct for error in VGA factory supplied focal
                         lengths
   -fs, --fullscreen     run disparity full screen mode
+  -t, --showcentredepth
+                        display cross-hairs target and depth from centre of
+                        image
   -cm, --colourmap      apply disparity false colour display
   -hs, --sidebysideh    display left image and disparity side by side
                         horizontally (stacked)
@@ -52,7 +55,20 @@ optional arguments:
                         vertically (stacked)
 ```
 
-Press the _"f"_ key to toggle disparity fullscreen, _"h/v"_ to toggle horizontal/vertical stacking, press  _"c"_ key to toggle disparity colour map and _space_ to change camera resolution mode (press _"x"_ to exit). Left click mouse in disparity image to print depth value at that point (beware that depth values in VGA mode maybe wrong unless ```-fix``` option is used). Changing between the resolutions worked when tested although it appears it does cause the camera image to freeze sometimes.
+Key commands can be used as follows:
+```
+Keyboard Controls:
+space    - change camera mode
+f        - toggle disparity full-screen mode
+c        - toggle disparity false colour mapping
+t        - toggle display centre target cross-hairs and depth
+h        - toggle horizontal side by side [left image | disparity]
+v        - toggle vertical side by side [left image | disparity]
+x        - exit
+
+```
+
+Left click mouse in disparity image to print depth value at that point (beware that depth values in VGA mode maybe wrong unless ```-fix``` option is used). Changing between the resolutions worked when tested although it appears it does cause the camera image to freeze sometimes.
 
 ---
 
