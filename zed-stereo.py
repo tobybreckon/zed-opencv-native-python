@@ -51,7 +51,7 @@ parser = argparse.ArgumentParser(description='Native live stereo from a StereoLa
 parser.add_argument("-c", "--camera_to_use", type=int, help="specify camera to use", default=0);
 parser.add_argument("-s", "--serial", type=int, help="camera serial number", default=0);
 parser.add_argument("-cf", "--config_file", type=str, help="camera calibration configuration file", default='');
-parser.add_argument("-fix", "--correct_focal_length", action='store_true', help="correct for error in VGA factory supplied focal lengths");
+parser.add_argument("-fix", "--correct_focal_length", action='store_true', help="correct for error in VGA factory supplied focal lengths for earlier production ZED cameras");
 parser.add_argument("-fill", "--fill_missing_disparity", action='store_true', help="fill missing disparity values via basic interpolation");
 parser.add_argument("-fs", "--fullscreen", action='store_true', help="run disparity full screen mode");
 parser.add_argument("-t",  "--showcentredepth", action='store_true', help="display cross-hairs target and depth from centre of image");

@@ -29,7 +29,7 @@ In general, this example can be used as follows:
 
 ```
 usage: zed-stereo.py [-h] [-c CAMERA_TO_USE] [-s SERIAL] [-cf CONFIG_FILE]
-                     [-fix] [-fs] [-t] [-cm] [-hs] [-vs]
+                     [-fix] [-fill] [-fs] [-t] [-cm] [-hs] [-vs]
 
 Native live stereo from a StereoLabs ZED camera using factory calibration.
 
@@ -43,7 +43,9 @@ optional arguments:
                         camera calibration configuration file
   -fix, --correct_focal_length
                         correct for error in VGA factory supplied focal
-                        lengths
+                        lengths for earlier production ZED cameras
+  -fill, --fill_missing_disparity
+                        fill missing disparity values via basic interpolation
   -fs, --fullscreen     run disparity full screen mode
   -t, --showcentredepth
                         display cross-hairs target and depth from centre of
@@ -64,6 +66,7 @@ c        - toggle disparity false colour mapping
 t        - toggle display centre target cross-hairs and depth
 h        - toggle horizontal side by side [left image | disparity]
 v        - toggle vertical side by side [left image | disparity]
+i        - toggle disparity filling via interpolation
 x        - exit
 
 ```
