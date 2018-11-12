@@ -1,6 +1,6 @@
 ################################################################################
 
-# image manipulation utilies - general and stereo camera specific
+# image manipulation utilities - general and stereo camera specific
 
 # Copyright (c) 2018 Toby Breckon, Durham University, UK
 
