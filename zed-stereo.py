@@ -52,6 +52,7 @@ parser.add_argument("-c", "--camera_to_use", type=int, help="specify camera to u
 parser.add_argument("-s", "--serial", type=int, help="camera serial number", default=0);
 parser.add_argument("-cf", "--config_file", type=str, help="camera calibration configuration file", default='');
 parser.add_argument("-fix", "--correct_focal_length", action='store_true', help="correct for error in VGA factory supplied focal lengths");
+parser.add_argument("-fill", "--fill_missing_disparity", action='store_true', help="fill missing disparity values via basic interpolation");
 parser.add_argument("-fs", "--fullscreen", action='store_true', help="run disparity full screen mode");
 parser.add_argument("-t",  "--showcentredepth", action='store_true', help="display cross-hairs target and depth from centre of image");
 parser.add_argument("-cm", "--colourmap", action='store_true', help="apply disparity false colour display");
@@ -155,6 +156,7 @@ print("c \t - toggle disparity false colour mapping");
 print("t \t - toggle display centre target cross-hairs and depth");
 print("h \t - toggle horizontal side by side [left image | disparity]");
 print("v \t - toggle vertical side by side [left image | disparity]");
+print("i \t - toggle disparity filling via interpolation");
 print("x \t - exit");
 print();
 
@@ -270,6 +272,13 @@ if (zed_cam.isOpened()) :
         _, disparity = cv2.threshold(disparity,0, max_disparity * 16, cv2.THRESH_TOZERO);
         disparity_scaled = (disparity / 16.).astype(np.uint8);
 
+        # fill disparity if requested
+
+        if (args.fill_missing_disparity):
+            _, mask = cv2.threshold(disparity_scaled,0, 1, cv2.THRESH_BINARY_INV);
+            mask[:,0:120] = 0;
+            disparity_scaled = cv2.inpaint(disparity_scaled, mask, 2, cv2.INPAINT_NS)
+
         # display disparity - which ** for display purposes only ** we re-scale to 0 ->255
 
         if (args.colourmap):
@@ -327,6 +336,8 @@ if (zed_cam.isOpened()) :
             args.colourmap = not(args.colourmap);
         elif (key == ord('f')):
             args.fullscreen = not(args.fullscreen);
+        elif (key == ord('i')):
+            args.fill_missing_disparity = not(args.fill_missing_disparity);
         elif (key == ord('t')):
             args.showcentredepth = not(args.showcentredepth);
         elif (key == ord('h')):
