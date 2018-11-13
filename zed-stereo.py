@@ -182,10 +182,12 @@ print();
 # process config to get camera calibration from calibration file
 
 if (camera_calibration_available):
-    fx, fy, B, Kl, Kr, R, T = zed_camera_calibration(cam_calibration, camera_mode, width, height);
+    fx, fy, B, Kl, Kr, R, T, Q = zed_camera_calibration(cam_calibration, camera_mode, width, height);
     if ((args.correct_focal_length) and (camera_mode == "VGA")):
         fx = fx / 2.0;
         fy = fy / 2.0;
+        Q[0][3] =  -1 * (width / 4); Q[1][3] = -1 * (height / 2);
+        Q[2][3] = fx; Q[3][3] = 0; # as Lcx == Rcx
 
 ################################################################################
 

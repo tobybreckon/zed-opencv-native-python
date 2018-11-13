@@ -90,17 +90,29 @@ def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
 
     T = np.array([[Baseline],[0],[0]]);
 
+    # define the Q matrix for disparity map (2D) to depth map projection (3D)
+    # (reference: Learning OpenCV - Gary Bradski, Adrian Kaehler, 2008)
+
+    Q = np.array([  [1, 0, 0, -1*Lcx],
+                    [0, 1, 0, -1*Lcy],
+                    [0, 0, 0, Lfx],
+                    [0, 0, -1.0/Baseline, ((Lcx - Rcx) / Baseline)]]
+                );
+
     # depth image is registered against left image so return set of values
-    # as (fx, fy, B, Kl,Kr) which are:
+    # as (fx, fy, B, Kl, Kr, R, T, Q) which are:
     # fx - lens focal length in x-axis
     # fy - lens focal length in x-axis
     # B - Baseline
-    # Kl - camera matrix K for left camera
-    # Kr - camera matrix R for right camera
+    # Kl - camera matrix K for left camera (3 x 3)
+    # Kr - camera matrix R for right camera (3 x 3)
+    # R - inter-camera rotation matrix (3 x 3)
+    # T - inter-camera translation vector (3 x 1)
+    # Q - disparity map (2D) to depth map projection (3D) projection matrix
 
     # N.B.  ZED camera are pre-rectified
 
-    return Lfx, Lfy, Baseline, K_CameraMatrix_left, K_CameraMatrix_right, R, T;
+    return Lfx, Lfy, Baseline, K_CameraMatrix_left, K_CameraMatrix_right, R, T, Q;
 
 
 ################################################################################
