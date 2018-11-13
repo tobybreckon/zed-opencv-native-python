@@ -55,6 +55,8 @@ optional arguments:
                         horizontally (stacked)
   -vs, --sidebysidev    display left image and disparity top to bottom
                         vertically (stacked)
+  --showcontrols        display track bar disparity tuning controls
+
 ```
 
 Key commands can be used as follows:
