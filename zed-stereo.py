@@ -76,7 +76,7 @@ parser.add_argument("-t",  "--showcentredepth", action='store_true', help="displ
 parser.add_argument("-cm", "--colourmap", action='store_true', help="apply disparity false colour display");
 parser.add_argument("-hs", "--sidebysideh", action='store_true', help="display left image and disparity side by side horizontally (stacked)");
 parser.add_argument("-vs", "--sidebysidev", action='store_true', help="display left image and disparity top to bottom vertically (stacked)");
-parser.add_argument("--showcontrols", action='store_true', help="display track bar tuning controls");
+parser.add_argument("--showcontrols", action='store_true', help="display track bar disparity tuning controls");
 
 args = parser.parse_args()
 
