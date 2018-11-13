@@ -45,6 +45,24 @@ def on_mouse_display_depth_value(event, x, y, flags, params):
 
 ################################################################################
 
+# track bar call back routine to set stereo parameters if controls are enabled
+
+def on_trackbar_set_disparities(value):
+    stereoProcessor.setNumDisparities(max(16, value * 16));
+
+def on_trackbar_set_blocksize(value):
+    if not(value % 2):
+        value = value + 1;
+    stereoProcessor.setBlockSize(max(3, value));
+
+def on_trackbar_set_speckle_range(value):
+    stereoProcessor.setSpeckleRange(value);
+
+def on_trackbar_set_speckle_window(value):
+    stereoProcessor.setSpeckleWindowSize(value);
+
+################################################################################
+
 # parse command line arguments for camera ID and config
 
 parser = argparse.ArgumentParser(description='Native live stereo from a StereoLabs ZED camera using factory calibration.');
@@ -58,8 +76,7 @@ parser.add_argument("-t",  "--showcentredepth", action='store_true', help="displ
 parser.add_argument("-cm", "--colourmap", action='store_true', help="apply disparity false colour display");
 parser.add_argument("-hs", "--sidebysideh", action='store_true', help="display left image and disparity side by side horizontally (stacked)");
 parser.add_argument("-vs", "--sidebysidev", action='store_true', help="display left image and disparity top to bottom vertically (stacked)");
-
-
+parser.add_argument("--showcontrols", action='store_true', help="display track bar tuning controls");
 
 args = parser.parse_args()
 
@@ -170,7 +187,6 @@ if (camera_calibration_available):
         fx = fx / 2.0;
         fy = fy / 2.0;
 
-
 ################################################################################
 
 # define display window names
@@ -218,6 +234,15 @@ if (zed_cam.isOpened()) :
 
     if (camera_calibration_available):
         cv2.setMouseCallback(windowNameD,on_mouse_display_depth_value, (fx, B));
+
+    # if specified add trackbars
+    if (args.showcontrols):
+        cv2.createTrackbar("Max Disparity(x 16): ", windowNameD, int(max_disparity/16), 8, on_trackbar_set_disparities);
+        cv2.createTrackbar("Window Size: ", windowNameD, window_size, 50, on_trackbar_set_blocksize);
+        cv2.createTrackbar("Speckle Window: ", windowNameD, 0, 200, on_trackbar_set_speckle_window);
+        cv2.createTrackbar("Speckle Range: ", windowNameD, 0, 5, on_trackbar_set_speckle_range);
+
+    #cv2.createTrackbar(windowNameD,"Max Disparity: ", 0, 128, on_trackbar_set_disparities);
 
     # loop control flags
 
