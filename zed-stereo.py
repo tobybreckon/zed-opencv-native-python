@@ -28,7 +28,7 @@ def on_mouse_display_depth_value(event, x, y, flags, params):
 
     # when the left mouse button has been clicked
 
-    if event == cv2.EVENT_LBUTTONDOWN:
+    if ((event == cv2.EVENT_LBUTTONDOWN) and not((args.sidebysidev) or (args.sidebysidev))):
 
         # unpack the set of parameters
 
