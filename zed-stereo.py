@@ -61,6 +61,21 @@ def on_trackbar_set_speckle_range(value):
 def on_trackbar_set_speckle_window(value):
     stereoProcessor.setSpeckleWindowSize(value);
 
+def on_trackbar_set_setDisp12MaxDiff(value):
+    stereoProcessor.setDisp12MaxDiff(value);
+
+def on_trackbar_set_setP1(value):
+    stereoProcessor.setP1(value);
+
+def on_trackbar_set_setP2(value):
+    stereoProcessor.setP2(value);
+
+def on_trackbar_set_setPreFilterCap(value):
+    stereoProcessor.setPreFilterCap(value);
+
+def on_trackbar_set_setUniquenessRatio(value):
+    stereoProcessor.setUniquenessRatio(value);
+
 ################################################################################
 
 # parse command line arguments for camera ID and config
@@ -239,10 +254,14 @@ if (zed_cam.isOpened()) :
 
     # if specified add trackbars
     if (args.showcontrols):
-        cv2.createTrackbar("Max Disparity(x 16): ", windowNameD, int(max_disparity/16), 8, on_trackbar_set_disparities);
+        cv2.createTrackbar("Max Disparity(x 16): ", windowNameD, int(max_disparity/16), 16, on_trackbar_set_disparities);
         cv2.createTrackbar("Window Size: ", windowNameD, window_size, 50, on_trackbar_set_blocksize);
         cv2.createTrackbar("Speckle Window: ", windowNameD, 0, 200, on_trackbar_set_speckle_window);
-        cv2.createTrackbar("Speckle Range: ", windowNameD, 0, 5, on_trackbar_set_speckle_range);
+        cv2.createTrackbar("LR Disparity Check Diff:", windowNameD, 0, 25, on_trackbar_set_setDisp12MaxDiff);
+        cv2.createTrackbar("Disaprity Smoothness P1: ", windowNameD, 0, 4000, on_trackbar_set_setP1);
+        cv2.createTrackbar("Disaprity Smoothness P2: ", windowNameD, 0, 16000, on_trackbar_set_setP2);
+        cv2.createTrackbar("Pre-filter Sobel-x- cap: ", windowNameD, 0, 5, on_trackbar_set_setPreFilterCap);
+        cv2.createTrackbar("Winning Match Cost Margin %: ", windowNameD, 0, 20, on_trackbar_set_setUniquenessRatio);
 
     #cv2.createTrackbar(windowNameD,"Max Disparity: ", 0, 128, on_trackbar_set_disparities);
 
