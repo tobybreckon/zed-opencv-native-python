@@ -83,7 +83,8 @@ def on_trackbar_set_setUniquenessRatio(value):
 parser = argparse.ArgumentParser(description='Native live stereo from a StereoLabs ZED camera using factory calibration.');
 parser.add_argument("-c", "--camera_to_use", type=int, help="specify camera to use", default=0);
 parser.add_argument("-s", "--serial", type=int, help="camera serial number", default=0);
-parser.add_argument("-cf", "--config_file", type=str, help="camera calibration configuration file", default='');
+parser.add_argument("-cf", "--config_file", type=str, help="ZED camera calibration configuration file", default='');
+parser.add_argument("-xml", "--config_file_xml", type=str, help="manual camera calibration XML configuration file", default='');
 parser.add_argument("-fix", "--correct_focal_length", action='store_true', help="correct for error in VGA factory supplied focal lengths for earlier production ZED cameras");
 parser.add_argument("-fill", "--fill_missing_disparity", action='store_true', help="in-fill missing disparity values via basic interpolation");
 parser.add_argument("-fs", "--fullscreen", action='store_true', help="run disparity full screen mode");
@@ -100,6 +101,7 @@ args = parser.parse_args()
 # process agruments to get camera calibration
 
 camera_calibration_available = False;
+manual_camera_calibration_available = False;
 
 if (args.serial > 0):
 
@@ -129,17 +131,14 @@ elif (len(args.config_file) > 0):
     path_to_config_file = args.config_file;
     camera_calibration_available = True;
 
+elif (len(args.config_file_xml) > 0):
+
+    path_to_config_file = args.config_file_xml;
+    manual_camera_calibration_available = True;
+
 else:
     print("Warning - no serial number or config file specified.");
     print();
-
-################################################################################
-
-# parse camera configuration as an INI format file
-
-if (camera_calibration_available):
-    cam_calibration = configparser.ConfigParser();
-    cam_calibration.read(path_to_config_file);
 
 ################################################################################
 
@@ -195,14 +194,23 @@ print();
 ################################################################################
 
 # process config to get camera calibration from calibration file
+# by parsing camera configuration as an INI format file
 
 if (camera_calibration_available):
+    cam_calibration = configparser.ConfigParser();
+    cam_calibration.read(path_to_config_file);
     fx, fy, B, Kl, Kr, R, T, Q = zed_camera_calibration(cam_calibration, camera_mode, width, height);
+
+    # correct factory supplied values if specified
+
     if ((args.correct_focal_length) and (camera_mode == "VGA")):
         fx = fx / 2.0;
         fy = fy / 2.0;
         Q[0][3] =  -1 * (width / 4); Q[1][3] = -1 * (height / 2);
         Q[2][3] = fx; Q[3][3] = 0; # as Lcx == Rcx
+elif (manual_camera_calibration_available):
+    fx, fy, B, Kl, Kr, R, T, Q = read_manual_calibration(path_to_config_file);
+    # no correction needed here
 
 ################################################################################
 
@@ -435,7 +443,8 @@ if (zed_cam.isOpened()) :
 
             # get calibration for new camera resolution
 
-            fx, fy, B, Kl, Kr, R, T = zed_camera_calibration(cam_calibration, camera_mode, width, height);
+            if (camera_calibration_available):
+                fx, fy, B, Kl, Kr, R, T = zed_camera_calibration(cam_calibration, camera_mode, width, height);
 
     # release camera
 
