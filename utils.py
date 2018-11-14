@@ -34,7 +34,7 @@ def h_concatenate(img1, img2):
     else:
         channels2 = img2.shape[2];
 
-    # make all images 3 channel, or assume all came channel
+    # make all images 3 channel, or assume all same channel
 
     if ((channels1 > channels2) and (channels1 == 3)):
         out2 = cv2.cvtColor(img2, cv2.COLOR_GRAY2BGR);
@@ -76,7 +76,7 @@ def v_concatenate(img1, img2):
     else:
         channels2 = img2.shape[2];
 
-    # make all images 3 channel, or assume all came channel
+    # make all images 3 channel, or assume all same channel
 
     if ((channels1 > channels2) and (channels1 == 3)):
         out2 = cv2.cvtColor(img2, cv2.COLOR_GRAY2BGR);
