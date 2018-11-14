@@ -6,6 +6,8 @@ This sample shows how to capture rectified images with the StereoLabs ZED (or ZE
 
 Alternatively, if you want to use OpenCV with the ZED SDK features, check out the StereoLabs sample [here](https://github.com/stereolabs/zed-opencv).
 
+In addition to manufacturer supplied calibration files, the ```-xml``` option alternatively facilitates the use of ```calibration.xml``` files generated via a 5-stage manual calibration and a chessboard calibration target using our [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py)) example from our [python-examples-cv](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py)) teaching repository.
+
 Developed to support teaching within the undergraduate Computer Science programme at [Durham University](http://www.durham.ac.uk) (UK) by [Prof. Toby Breckon](http://community.dur.ac.uk/toby.breckon/). All tested with [OpenCV](http://www.opencv.org) 3.x and Python 3.x.
 
 ---
@@ -29,7 +31,8 @@ In general, this example can be used as follows:
 
 ```
 usage: zed-stereo.py [-h] [-c CAMERA_TO_USE] [-s SERIAL] [-cf CONFIG_FILE]
-                     [-fix] [-fill] [-fs] [-t] [-cm] [-hs] [-vs]
+                     [-xml CONFIG_FILE_XML] [-fix] [-fill] [-fs] [-t] [-cm]
+                     [-hs] [-vs] [--showcontrols]
 
 Native live stereo from a StereoLabs ZED camera using factory calibration.
 
@@ -40,12 +43,15 @@ optional arguments:
   -s SERIAL, --serial SERIAL
                         camera serial number
   -cf CONFIG_FILE, --config_file CONFIG_FILE
-                        camera calibration configuration file
+                        ZED camera calibration configuration file
+  -xml CONFIG_FILE_XML, --config_file_xml CONFIG_FILE_XML
+                        manual camera calibration XML configuration file
   -fix, --correct_focal_length
                         correct for error in VGA factory supplied focal
                         lengths for earlier production ZED cameras
   -fill, --fill_missing_disparity
-                        in-fill missing disparity values via basic interpolation
+                        in-fill missing disparity values via basic
+                        interpolation
   -fs, --fullscreen     run disparity full screen mode
   -t, --showcentredepth
                         display cross-hairs target and depth from centre of
