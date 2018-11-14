@@ -45,7 +45,7 @@ optional arguments:
                         correct for error in VGA factory supplied focal
                         lengths for earlier production ZED cameras
   -fill, --fill_missing_disparity
-                        fill missing disparity values via basic interpolation
+                        in-fill missing disparity values via basic interpolation
   -fs, --fullscreen     run disparity full screen mode
   -t, --showcentredepth
                         display cross-hairs target and depth from centre of
@@ -68,7 +68,7 @@ c        - toggle disparity false colour mapping
 t        - toggle display centre target cross-hairs and depth
 h        - toggle horizontal side by side [left image | disparity]
 v        - toggle vertical side by side [left image | disparity]
-i        - toggle disparity filling via interpolation
+i        - toggle disparity in-filling via interpolation
 x        - exit
 
 ```
