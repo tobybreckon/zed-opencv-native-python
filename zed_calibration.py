@@ -36,7 +36,7 @@ def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
         right = camera_calibration['RIGHT_CAM_'+camera_mode];
         common = camera_calibration['STEREO'];
     except:
-        print("Error -specified config file does not contain valid ZED config.");
+        print("Error - specified config file does not contain valid ZED config.");
         exit(1);
 
     #[LEFT_CAM_xxx] - intrinsics
@@ -132,19 +132,23 @@ def read_manual_calibration(calibration_file):
     f= cv2.FileStorage(calibration_file,cv2.FILE_STORAGE_READ);
 
     if (f.isOpened()):
-        K_CameraMatrix_left = f.getNode("K_l").mat()
-        K_CameraMatrix_right = f.getNode("K_r").mat()
-        Lfx = K_CameraMatrix_left[0][0]
-        Lfy = K_CameraMatrix_left[1][1]
-        R = f.getNode("R").mat()
-        T = f.getNode("T").mat()
-        Baseline = -1 * T[0][0] # i.e. x-axis of T vector
-        Q = f.getNode("Q").mat()
+        try:
+            K_CameraMatrix_left = f.getNode("K_l").mat()
+            K_CameraMatrix_right = f.getNode("K_r").mat()
+            Lfx = K_CameraMatrix_left[0][0]
+            Lfy = K_CameraMatrix_left[1][1]
+            R = f.getNode("R").mat()
+            T = f.getNode("T").mat()
+            Baseline = -1 * T[0][0] # i.e. x-axis of T vector
+            Q = f.getNode("Q").mat()
+        except:
+            print("Error - specified XML config file does not contain valid camera config.");
+            exit(1);
 
         return Lfx, Lfy, Baseline, K_CameraMatrix_left, K_CameraMatrix_right, R, T, Q;
 
     else:
-        print("Error -specified XML config file does not contain valid camera config.");
+        print("Error - cannot open specified XML config file.");
         exit(1);
 
 ################################################################################
