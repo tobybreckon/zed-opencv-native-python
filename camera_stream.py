@@ -8,7 +8,7 @@
 # MIT License (MIT)
 
 # based on code from this tutorial, with changes to make object method call compatible
-# with cv2.VideoCapture(src) as far as possible:
+# with cv2.VideoCapture(src) as far as possible and improved thread management:
 # https://www.pyimagesearch.com/2015/12/21/increasing-webcam-fps-with-python-and-opencv/
 
 ################################################################################
