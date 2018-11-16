@@ -41,10 +41,13 @@ class CameraVideoStream:
 		self.camera = cv2.VideoCapture(src)
 		(self.grabbed, self.frame) = self.camera.read()
 
-		# start the thread to read frames from the video stream
-		t = Thread(target=self.update, name=self.name, args=())
-		t.daemon = True
-		t.start()
+		# only start the thread if in-fact the camera read was successful
+		if (self.grabbed):
+			# start the thread to read frames from the video stream
+			t = Thread(target=self.update, name=self.name, args=())
+			t.daemon = True
+			t.start()
+
 		return (self.grabbed > 0);
 
 	def update(self):
