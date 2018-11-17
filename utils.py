@@ -96,3 +96,15 @@ def v_concatenate(img1, img2):
     return np.vstack((out1, out2));
 
 ################################################################################
+
+# to keep the main code body cleaner/clearer abstract the check for the open3d
+# library being available (www.open3d.org) - used for 3D point cloud display
+
+def open3d_library_available():
+    try:
+        import open3d
+        retun True;
+    except:
+        return False;
+
+################################################################################
