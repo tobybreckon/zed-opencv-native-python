@@ -103,7 +103,7 @@ def v_concatenate(img1, img2):
 def open3d_library_available():
     try:
         import open3d
-        retun True;
+        return True;
     except:
         return False;
 
