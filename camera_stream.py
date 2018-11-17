@@ -65,6 +65,14 @@ class CameraVideoStream:
 			if not(self.suspend):
 				(self.grabbed, self.frame) = self.camera.read()
 
+	def grab(self):
+		# return status of most recent grab by the thread
+		return self.grabbed;
+
+	def retrieve(self):
+		# same as read() in the context of threaded capture
+		return self.read();
+
 	def read(self):
 		# return the frame most recently read
 		return (self.grabbed, self.frame)
