@@ -22,6 +22,18 @@ from utils import *
 
 ################################################################################
 
+# check for the optional open3d library used for 3D point cloud display
+
+if (open3d_library_available()):
+    import open3d as o3d
+    print("\nOpen3D status: available\n");
+    open3d_available = True;
+else:
+    print("\nOpen3D status: not available\n");
+    open3d_available = False;
+
+################################################################################
+
 # mouse call back routine to display depth value at selected point
 
 def on_mouse_display_depth_value(event, x, y, flags, params):
@@ -34,9 +46,12 @@ def on_mouse_display_depth_value(event, x, y, flags, params):
 
         f, B = params;
 
-        # calculate the depth and display it in the terminal
+        # safely calculate the depth and display it in the terminal
 
-        depth = f * (B / disparity_scaled[y,x]);
+        if (disparity_scaled[y,x] > 0):
+            depth = f * (B / disparity_scaled[y,x]);
+        else:
+            depth = 0;
 
         # as the calibration for the ZED camera is in millimetres, divide
         # by 1000 to get it in metres
@@ -84,15 +99,17 @@ parser = argparse.ArgumentParser(description='Native live stereo from a StereoLa
 parser.add_argument("-c", "--camera_to_use", type=int, help="specify camera to use", default=0);
 parser.add_argument("-s", "--serial", type=int, help="camera serial number", default=0);
 parser.add_argument("-cf", "--config_file", type=str, help="ZED camera calibration configuration file", default='');
-parser.add_argument("-xml", "--config_file_xml", type=str, help="manual camera calibration XML configuration file", default='');
+parser.add_argument("-cm", "--colourmap", action='store_true', help="apply disparity false colour display");
 parser.add_argument("-fix", "--correct_focal_length", action='store_true', help="correct for error in VGA factory supplied focal lengths for earlier production ZED cameras");
 parser.add_argument("-fill", "--fill_missing_disparity", action='store_true', help="in-fill missing disparity values via basic interpolation");
 parser.add_argument("-fs", "--fullscreen", action='store_true', help="run disparity full screen mode");
 parser.add_argument("-t",  "--showcentredepth", action='store_true', help="display cross-hairs target and depth from centre of image");
-parser.add_argument("-cm", "--colourmap", action='store_true', help="apply disparity false colour display");
 parser.add_argument("-hs", "--sidebysideh", action='store_true', help="display left image and disparity side by side horizontally (stacked)");
 parser.add_argument("-vs", "--sidebysidev", action='store_true', help="display left image and disparity top to bottom vertically (stacked)");
+parser.add_argument("-xml", "--config_file_xml", type=str, help="manual camera calibration XML configuration file", default='');
 parser.add_argument("--showcontrols", action='store_true', help="display track bar disparity tuning controls");
+if (open3d_available):
+    parser.add_argument("-3d", "--show3d", action='store_true', help="display resulting live 3D point cloud");
 
 args = parser.parse_args()
 
@@ -218,6 +235,7 @@ elif (manual_camera_calibration_available):
 
 windowName = "Live Camera Input"; # window name
 windowNameD = "Stereo Disparity"; # window name
+windowName3D = "Live - 3D Point Cloud"; # window name
 
 ################################################################################
 
@@ -246,13 +264,24 @@ stereoProcessor = cv2.StereoSGBM_create(
 
 if (zed_cam.isOpened()) :
 
-    # create window by name (as resizable)
+    # create windows by name (as resizable)
 
     cv2.namedWindow(windowName, cv2.WINDOW_NORMAL);
     cv2.resizeWindow(windowName, width, height);
 
     cv2.namedWindow(windowNameD, cv2.WINDOW_NORMAL);
     cv2.resizeWindow(windowNameD, int(width/2), height);
+
+    if ((open3d_available) and (args.show3d)):
+        window_3d_vis = o3d.Visualizer();
+        window_3d_vis.create_window(windowName3D);
+
+        # init point cloud as empty
+
+        point_cloud = o3d.PointCloud();
+        window_3d_vis.add_geometry(point_cloud);
+
+        o3d.set_verbosity_level(o3d.VerbosityLevel.Debug);
 
     # if calibration is available then set call back to allow for depth display
     # on left mouse button click
@@ -332,6 +361,43 @@ if (zed_cam.isOpened()) :
             _, mask = cv2.threshold(disparity_scaled,0, 1, cv2.THRESH_BINARY_INV);
             mask[:,0:120] = 0;
             disparity_scaled = cv2.inpaint(disparity_scaled, mask, 2, cv2.INPAINT_NS)
+
+        ## 3D point cloud display (Open3D)) ####################################
+
+        if ((open3d_available) and (args.show3d)):
+
+            # project disparity to 3D point cloud
+
+            depth_image = cv2.reprojectImageTo3D(disparity_scaled, Q, handleMissingValues=False, ddepth=cv2.CV_16S);
+
+            rgbd_image = o3d.create_rgbd_image_from_color_and_depth(o3d.Image(cv2.cvtColor(frameL,cv2.COLOR_BGR2RGB)),
+                                                                    o3d.Image(depth_image[:,:,2].astype(np.uint8)),
+                                                                    convert_rgb_to_intensity=False);
+
+            #print(o3d.PinholeCameraIntrinsic(int(width / 2.0), height, fx, fy, Kl[0][2], Kl[1][2]).intrinsic_matrix_)
+            #print(o3d.PinholeCameraIntrinsic(o3d.PinholeCameraIntrinsicParameters.PrimeSenseDefault).intrinsic_matrix_)
+
+
+            point_cloud.clear();
+            point_cloud += o3d.create_point_cloud_from_rgbd_image(rgbd_image,
+                                            # o3d.PinholeCameraIntrinsic(o3d.PinholeCameraIntrinsicParameters.PrimeSenseDefault));
+                                            o3d.PinholeCameraIntrinsic(int(width / 2.0), height, fx, fy, Kl[0][2], Kl[1][2]));
+
+            # Flip it, otherwise the pointcloud will be upside down
+            point_cloud.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]]);
+
+            # update the 3D visualization which is referencing the depth points
+
+            # window_3d_vis.add_geometry(point_cloud);
+            window_3d_vis.update_geometry();
+            window_3d_vis.reset_view_point(True);
+            window_3d_vis.poll_events();
+            window_3d_vis.update_renderer();
+
+
+            # o3d.draw_geometries([point_cloud])
+
+        ## image display and event handling (OpenCV) ###########################
 
         # display disparity - which ** for display purposes only ** we re-scale to 0 ->255
 
@@ -446,9 +512,16 @@ if (zed_cam.isOpened()) :
             if (camera_calibration_available):
                 fx, fy, B, Kl, Kr, R, T = zed_camera_calibration(cam_calibration, camera_mode, width, height);
 
+            ####################################################################
+
     # release camera
 
     zed_cam.release();
+
+    # close 3D visualization
+
+    if ((open3d_available) and (args.show3d)):
+        window_3d_vis.destroy_window()
 
 else:
     print("Error - no camera connected.");
