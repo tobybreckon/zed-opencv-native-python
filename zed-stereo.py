@@ -34,9 +34,12 @@ def on_mouse_display_depth_value(event, x, y, flags, params):
 
         f, B = params;
 
-        # calculate the depth and display it in the terminal
+        # safely calculate the depth and display it in the terminal
 
-        depth = f * (B / disparity_scaled[y,x]);
+        if (disparity_scaled[y,x] > 0):
+            depth = f * (B / disparity_scaled[y,x]);
+        else:
+            depth = 0;
 
         # as the calibration for the ZED camera is in millimetres, divide
         # by 1000 to get it in metres
@@ -84,14 +87,14 @@ parser = argparse.ArgumentParser(description='Native live stereo from a StereoLa
 parser.add_argument("-c", "--camera_to_use", type=int, help="specify camera to use", default=0);
 parser.add_argument("-s", "--serial", type=int, help="camera serial number", default=0);
 parser.add_argument("-cf", "--config_file", type=str, help="ZED camera calibration configuration file", default='');
-parser.add_argument("-xml", "--config_file_xml", type=str, help="manual camera calibration XML configuration file", default='');
+parser.add_argument("-cm", "--colourmap", action='store_true', help="apply disparity false colour display");
 parser.add_argument("-fix", "--correct_focal_length", action='store_true', help="correct for error in VGA factory supplied focal lengths for earlier production ZED cameras");
 parser.add_argument("-fill", "--fill_missing_disparity", action='store_true', help="in-fill missing disparity values via basic interpolation");
 parser.add_argument("-fs", "--fullscreen", action='store_true', help="run disparity full screen mode");
 parser.add_argument("-t",  "--showcentredepth", action='store_true', help="display cross-hairs target and depth from centre of image");
-parser.add_argument("-cm", "--colourmap", action='store_true', help="apply disparity false colour display");
 parser.add_argument("-hs", "--sidebysideh", action='store_true', help="display left image and disparity side by side horizontally (stacked)");
 parser.add_argument("-vs", "--sidebysidev", action='store_true', help="display left image and disparity top to bottom vertically (stacked)");
+parser.add_argument("-xml", "--config_file_xml", type=str, help="manual camera calibration XML configuration file", default='');
 parser.add_argument("--showcontrols", action='store_true', help="display track bar disparity tuning controls");
 
 args = parser.parse_args()
