@@ -39,7 +39,7 @@ def h_concatenate(img1, img2):
     if ((channels1 > channels2) and (channels1 == 3)):
         out2 = cv2.cvtColor(img2, cv2.COLOR_GRAY2BGR);
         out1 = img1;
-    elif ((channels2 > channels1) and (channels1 == 3)):
+    elif ((channels2 > channels1) and (channels2 == 3)):
         out1 = cv2.cvtColor(img1, cv2.COLOR_GRAY2BGR);
         out2 = img2;
     else: # both must be equal
@@ -81,7 +81,7 @@ def v_concatenate(img1, img2):
     if ((channels1 > channels2) and (channels1 == 3)):
         out2 = cv2.cvtColor(img2, cv2.COLOR_GRAY2BGR);
         out1 = img1;
-    elif ((channels2 > channels1) and (channels1 == 3)):
+    elif ((channels2 > channels1) and (channels2 == 3)):
         out1 = cv2.cvtColor(img1, cv2.COLOR_GRAY2BGR);
         out2 = img2;
     else: # both must be equal
@@ -94,17 +94,5 @@ def v_concatenate(img1, img2):
         out2 = cv2.resize(out2, (height2, width1))
 
     return np.vstack((out1, out2));
-
-################################################################################
-
-# to keep the main code body cleaner/clearer abstract the check for the open3d
-# library being available (www.open3d.org) - used for 3D point cloud display
-
-def open3d_library_available():
-    try:
-        import open3d
-        return True;
-    except:
-        return False;
 
 ################################################################################
