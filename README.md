@@ -6,7 +6,7 @@ This sample shows how to capture rectified images with the StereoLabs ZED (or ZE
 
 Alternatively, if you want to use OpenCV with the ZED SDK features, check out the StereoLabs sample [here](https://github.com/stereolabs/zed-opencv).
 
-In addition to manufacturer supplied calibration files, the ```-xml``` option alternatively facilitates the use of ```calibration.xml``` files generated via a 5-stage manual calibration and a chessboard calibration target using our [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py)) example from our [python-examples-cv](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py)) teaching repository.
+In addition to manufacturer supplied calibration files, the ```-xml``` option alternatively facilitates the use of ```calibration.xml``` files generated via a 5-stage chessboard target based, manual calibration process performed using the [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py) example tool from our [python-examples-cv](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py) teaching repository.
 
 Developed to support teaching within the undergraduate Computer Science programme at [Durham University](http://www.durham.ac.uk) (UK) by [Prof. Toby Breckon](http://community.dur.ac.uk/toby.breckon/). All tested with [OpenCV](http://www.opencv.org) 3.x and Python 3.x.
 
@@ -14,7 +14,7 @@ Developed to support teaching within the undergraduate Computer Science programm
 
 ### How to download and run:
 
-_Firstly_, you ideally need to know the serial number of the ZED stereo camera you are trying to use. To do so, you can use ZED Explorer tools (ZED SDK tools) and check the serial number on the top right of ZED Explorer window or alternatively each camera has a small label on the end of the USB lead with the serial number on it.
+_Firstly_, you ideally need to know the serial number of the ZED stereo camera you are trying to use in order to access the manufacturer's factory calibration. To do so, you can use ZED Explorer tools (ZED SDK tools) and check the serial number on the top right of ZED Explorer window or alternatively each camera has a small label on the end of the USB lead with the serial number on it.
 
 
 Clone the repository and run as follows, with your camera serial number as ```SERIAL```:
@@ -31,8 +31,8 @@ In general, this example can be used as follows:
 
 ```
 usage: zed-stereo.py [-h] [-c CAMERA_TO_USE] [-s SERIAL] [-cf CONFIG_FILE]
-                     [-xml CONFIG_FILE_XML] [-fix] [-fill] [-fs] [-t] [-cm]
-                     [-hs] [-vs] [--showcontrols]
+                     [-cm] [-fix] [-fill] [-fs] [-t] [-hs] [-vs]
+                     [-xml CONFIG_FILE_XML] [--showcontrols]
 
 Native live stereo from a StereoLabs ZED camera using factory calibration.
 
@@ -44,8 +44,7 @@ optional arguments:
                         camera serial number
   -cf CONFIG_FILE, --config_file CONFIG_FILE
                         ZED camera calibration configuration file
-  -xml CONFIG_FILE_XML, --config_file_xml CONFIG_FILE_XML
-                        manual camera calibration XML configuration file
+  -cm, --colourmap      apply disparity false colour display
   -fix, --correct_focal_length
                         correct for error in VGA factory supplied focal
                         lengths for earlier production ZED cameras
@@ -56,13 +55,13 @@ optional arguments:
   -t, --showcentredepth
                         display cross-hairs target and depth from centre of
                         image
-  -cm, --colourmap      apply disparity false colour display
   -hs, --sidebysideh    display left image and disparity side by side
                         horizontally (stacked)
   -vs, --sidebysidev    display left image and disparity top to bottom
                         vertically (stacked)
+  -xml CONFIG_FILE_XML, --config_file_xml CONFIG_FILE_XML
+                        manual camera calibration XML configuration file
   --showcontrols        display track bar disparity tuning controls
-
 ```
 
 Key commands can be used as follows:
