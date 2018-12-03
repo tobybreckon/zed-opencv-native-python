@@ -44,9 +44,9 @@ class CameraVideoStream:
 		# only start the thread if in-fact the camera read was successful
 		if (self.grabbed):
 			# start the thread to read frames from the video stream
-			t = Thread(target=self.update, name=self.name, args=())
-			t.daemon = True
-			t.start()
+			self._thread = Thread(target=self.update, name=self.name, args=())
+			self._thread.daemon = True
+			self._thread.start()
 
 		return (self.grabbed > 0);
 
@@ -83,7 +83,8 @@ class CameraVideoStream:
 
 	def release(self):
 		# indicate that the thread should be stopped
-		self.stopped = True
+		self.stopped = True;
+		self._thread.join();
 
 	def set(self, property_name, property_value):
 		# set a video capture property (behavior as per OpenCV manual for VideoCapture)
