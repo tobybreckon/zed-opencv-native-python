@@ -16,6 +16,7 @@ import math
 import requests
 import configparser
 
+from collections import OrderedDict
 from camera_stream import *
 from zed_calibration import *
 from utils import *
@@ -182,8 +183,8 @@ height,width, channels = frame.shape;
 # 720p 	60 	    2560 x 720      HD
 # WVGA 	100 	1344 x 376      VGA
 
-config_options_width = {4416: "2K", 3840: "FHD", 2560: "HD", 1344: "VGA"};
-config_options_height = {1242: "2K", 1080: "FHD", 720: "HD", 376: "VGA"};
+config_options_width = OrderedDict({4416: "2K", 3840: "FHD", 2560: "HD", 1344: "VGA"});
+config_options_height = OrderedDict({1242: "2K", 1080: "FHD", 720: "HD", 376: "VGA"});
 
 try:
     camera_mode = config_options_width[width];
@@ -241,20 +242,22 @@ windowName3D = "Live - 3D Point Cloud"; # window name
 
 # set up defaults for stereo disparity calculation
 
-max_disparity = 128;
-window_size = 21;
+max_disparity = 160;
+window_size = 9;
+block_size = 15
 
+### modified for 2K image
 stereoProcessor = cv2.StereoSGBM_create(
         minDisparity=0,
         numDisparities = max_disparity, # max_disp has to be dividable by 16 f. E. HH 192, 256
-        blockSize=window_size,
-        #P1=8 * window_size ** 2,       # 8*number_of_image_channels*SADWindowSize*SADWindowSize
-        #P2=32 * window_size ** 2,      # 32*number_of_image_channels*SADWindowSize*SADWindowSize
-        #disp12MaxDiff=1,
-        #uniquenessRatio=15,
-        #speckleWindowSize=0,
-        #speckleRange=2,
-        #preFilterCap=63,
+        blockSize=block_size,
+        P1=8 * 3 * window_size ** 2,       # 8*number_of_image_channels*SADWindowSize*SADWindowSize
+        P2=32 * 3 * window_size ** 2,      # 32*number_of_image_channels*SADWindowSize*SADWindowSize
+        disp12MaxDiff=1,
+        uniquenessRatio=5,
+        speckleWindowSize=0,
+        speckleRange=2,
+        preFilterCap=15,
         mode=cv2.STEREO_SGBM_MODE_HH
 )
 
@@ -279,7 +282,11 @@ if (zed_cam.isOpened()) :
         # init point cloud as empty
 
         point_cloud = o3d.PointCloud();
+        #dummy point cloud to define viewing parameters
+        point_cloud.points = o3d.Vector3dVector(np.array([[i, 0, 0] for i in range(-60, 60)]))
         window_3d_vis.add_geometry(point_cloud);
+
+        coordinate_axes = o3d.create_mesh_coordinate_frame(size=10, origin=[0, 0, 0])
 
         o3d.set_verbosity_level(o3d.VerbosityLevel.Debug);
 
@@ -328,11 +335,10 @@ if (zed_cam.isOpened()) :
         frameL= frame[:,0:int(width/2),:]
         frameR = frame[:,int(width/2):width,:]
 
-        # remember to convert to grayscale (as the disparity matching works on grayscale)
-
+        # remember to convert to grayscale (as the disparity matching works on grayscale)        
         grayL = cv2.cvtColor(frameL,cv2.COLOR_BGR2GRAY);
         grayR = cv2.cvtColor(frameR,cv2.COLOR_BGR2GRAY);
-
+            
         # perform preprocessing - raise to the power, as this subjectively appears
         # to improve subsequent disparity calculation
 
@@ -353,44 +359,64 @@ if (zed_cam.isOpened()) :
         # as disparity=-1 means no disparity available
 
         _, disparity = cv2.threshold(disparity,0, max_disparity * 16, cv2.THRESH_TOZERO);
-        disparity_scaled = (disparity / 16.).astype(np.uint8);
+        disparity_scaled = (disparity / 16);
 
         # fill disparity if requested
 
         if (args.fill_missing_disparity):
             _, mask = cv2.threshold(disparity_scaled,0, 1, cv2.THRESH_BINARY_INV);
             mask[:,0:120] = 0;
-            disparity_scaled = cv2.inpaint(disparity_scaled, mask, 2, cv2.INPAINT_NS)
+            disparity_scaled = cv2.inpaint(disparity_scaled.astype(np.uint8), mask, 2, cv2.INPAINT_NS)
 
         ## 3D point cloud display (Open3D)) ####################################
 
         if ((open3d_available) and (args.show3d)):
-
             # project disparity to 3D point cloud
+            
+            #transform to RGB from BGR format
+            frameL = cv2.cvtColor(frameL, cv2.COLOR_BGR2RGB)
 
-            depth_image = cv2.reprojectImageTo3D(disparity_scaled, Q, handleMissingValues=False, ddepth=cv2.CV_16S);
-
-            rgbd_image = o3d.create_rgbd_image_from_color_and_depth(o3d.Image(cv2.cvtColor(frameL,cv2.COLOR_BGR2RGB)),
-                                                                    o3d.Image(depth_image[:,:,2].astype(np.uint8)),
-                                                                    convert_rgb_to_intensity=False);
-
-            #print(o3d.PinholeCameraIntrinsic(int(width / 2.0), height, fx, fy, Kl[0][2], Kl[1][2]).intrinsic_matrix_)
-            #print(o3d.PinholeCameraIntrinsic(o3d.PinholeCameraIntrinsicParameters.PrimeSenseDefault).intrinsic_matrix_)
-
-
+            #remove all points from the point cloud
             point_cloud.clear();
-            point_cloud += o3d.create_point_cloud_from_rgbd_image(rgbd_image,
-                                            # o3d.PinholeCameraIntrinsic(o3d.PinholeCameraIntrinsicParameters.PrimeSenseDefault));
-                                            o3d.PinholeCameraIntrinsic(int(width / 2.0), height, fx, fy, Kl[0][2], Kl[1][2]));
+            
+            #initialise new array for points and colours
+            points = []
+            colours = []
 
+            dispShape = disparity_scaled.shape
+
+            #prepare list of colours and points in format [x, y, d[y, x], 1]
+            for x in range(dispShape[1]):
+                for y in range(dispShape[0]):
+                    if disparity_scaled[y, x] != 0:
+                        t = np.array([x, y, disparity_scaled[y, x], 1])
+                        points.append(t.T)
+                        colours.append(list(frameL[y, x]))
+
+            #reproject each point to 3d homogeneous coordinates
+            points = [Q.dot(t) for t in points]
+
+            #convert to 3d world coordinates
+            points = [t[:3] / t[3] for t in points]
+            
+            #rawPoints = np.array(depth_image)
+            #rawPoints = rawPoints.reshape(-1, rawPoints.shape[-1])
+            
+            point_cloud.points = o3d.Vector3dVector(np.array(points))
+            
+            #colours are represented as floats in range [0, 1]
+            point_cloud.colors = o3d.Vector3dVector(np.array(colours) / 255.)
+            
             # Flip it, otherwise the pointcloud will be upside down
-            point_cloud.transform([[1, 0, 0, 0], [0, -1, 0, 0], [0, 0, -1, 0], [0, 0, 0, 1]]);
+            point_cloud.transform([[-1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]);
+            point_cloud = o3d.crop_point_cloud(point_cloud, np.array([-5000., -3000.0000, -10000.0000]), np.array([5000.0000, 3000.0000, 0.0000]))
 
+            #o3d.draw_geometries([point_cloud, coordinate_axes])
             # update the 3D visualization which is referencing the depth points
 
-            # window_3d_vis.add_geometry(point_cloud);
+            window_3d_vis.add_geometry(point_cloud);
             window_3d_vis.update_geometry();
-            window_3d_vis.reset_view_point(True);
+            #window_3d_vis.reset_view_point(True);
             window_3d_vis.poll_events();
             window_3d_vis.update_renderer();
 
@@ -404,7 +430,8 @@ if (zed_cam.isOpened()) :
         if (args.colourmap):
             disparity_to_display = cv2.applyColorMap((disparity_scaled * (256. / max_disparity)).astype(np.uint8), cv2.COLORMAP_HOT);
         else:
-            disparity_to_display = (disparity_scaled * (256. / max_disparity)).astype(np.uint8);
+            #disparity_to_display = (disparity_scaled * (256. / max_disparity)).astype(np.uint8);
+            disparity_to_display = disparity_scaled.astype("uint8")
 
         # if requested draw target and display depth from centre of image
 
@@ -472,6 +499,12 @@ if (zed_cam.isOpened()) :
             list_widths = list(config_options_width.keys())
             list_heights = list(config_options_height.keys())
 
+            list_widths.sort(reverse=True)
+            list_heights.sort(reverse=True)
+
+            print(list_widths)
+            print(list_heights)
+            
             for (width_resolution, config_name) in config_options_width.items():
 
                     if (list_widths[pos % len(list_widths)] == width):
@@ -490,8 +523,10 @@ if (zed_cam.isOpened()) :
 
             # reset to new camera resolution
 
-            zed_cam.set(cv2.CAP_PROP_FRAME_WIDTH, float(width))
-            zed_cam.set(cv2.CAP_PROP_FRAME_HEIGHT, float(height))
+            zed_cam.release()
+            zed_cam.openSet(args.camera_to_use, width, height)
+            #zed_cam.set(cv2.CAP_PROP_FRAME_WIDTH, width)
+            #zed_cam.set(cv2.CAP_PROP_FRAME_HEIGHT, height)
 
             width = int(zed_cam.get(cv2.CAP_PROP_FRAME_WIDTH))
             height =  int(zed_cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
@@ -510,7 +545,7 @@ if (zed_cam.isOpened()) :
             # get calibration for new camera resolution
 
             if (camera_calibration_available):
-                fx, fy, B, Kl, Kr, R, T = zed_camera_calibration(cam_calibration, camera_mode, width, height);
+                fx, fy, B, Kl, Kr, R, T, Q = zed_camera_calibration(cam_calibration, camera_mode, width, height);
 
             ####################################################################
 
