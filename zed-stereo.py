@@ -319,7 +319,7 @@ if (zed_cam.isOpened()) :
         # compute disparity image from undistorted and rectified versions
         # (which for reasons best known to the OpenCV developers is returned scaled by 16)
 
-        disparity = stereoProcessor.compute(grayL,grayR);
+        disparity = stereoProcessor.compute(cv2.UMat(grayL),cv2.UMat(grayR));
 
         # cv2.filterSpeckles(disparity, 0, 4000, max_disparity);
 
@@ -330,7 +330,7 @@ if (zed_cam.isOpened()) :
         # as disparity=-1 means no disparity available
 
         _, disparity = cv2.threshold(disparity,0, max_disparity * 16, cv2.THRESH_TOZERO);
-        disparity_scaled = (disparity / 16.).astype(np.uint8);
+        disparity_scaled = (cv2.UMat.get(disparity) / 16.).astype(np.uint8);
 
         # fill disparity if requested
 
