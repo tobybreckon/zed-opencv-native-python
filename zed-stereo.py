@@ -447,7 +447,7 @@ if (zed_cam.isOpened()) :
             # get calibration for new camera resolution
 
             if (camera_calibration_available):
-                fx, fy, B, Kl, Kr, R, T = zed_camera_calibration(cam_calibration, camera_mode, width, height);
+                fx, fy, B, Kl, Kr, R, T, Q = zed_camera_calibration(cam_calibration, camera_mode, width, height);
 
     # release camera
 
