@@ -94,6 +94,7 @@ parser.add_argument("-fs", "--fullscreen", action='store_true', help="run dispar
 parser.add_argument("-t",  "--showcentredepth", action='store_true', help="display cross-hairs target and depth from centre of image");
 parser.add_argument("-hs", "--sidebysideh", action='store_true', help="display left image and disparity side by side horizontally (stacked)");
 parser.add_argument("-vs", "--sidebysidev", action='store_true', help="display left image and disparity top to bottom vertically (stacked)");
+parser.add_argument("-no", "--nooriginal", action='store_true', help="do not display original live image from camera");
 parser.add_argument("-xml", "--config_file_xml", type=str, help="manual camera calibration XML configuration file", default='');
 parser.add_argument("--showcontrols", action='store_true', help="display track bar disparity tuning controls");
 
@@ -190,6 +191,7 @@ print("c \t - toggle disparity false colour mapping");
 print("t \t - toggle display centre target cross-hairs and depth");
 print("h \t - toggle horizontal side by side [left image | disparity]");
 print("v \t - toggle vertical side by side [left image | disparity]");
+print("o \t - toggle original live image display");
 print("i \t - toggle disparity in-filling via interpolation");
 print("x \t - exit");
 print();
@@ -251,8 +253,9 @@ if (zed_cam.isOpened()) :
 
     # create window by name (as resizable)
 
-    cv2.namedWindow(windowName, cv2.WINDOW_NORMAL);
-    cv2.resizeWindow(windowName, width, height);
+    if (not(args.nooriginal)):
+        cv2.namedWindow(windowName, cv2.WINDOW_NORMAL);
+        cv2.resizeWindow(windowName, width, height);
 
     cv2.namedWindow(windowNameD, cv2.WINDOW_NORMAL);
     cv2.resizeWindow(windowNameD, int(width/2), height);
@@ -374,7 +377,8 @@ if (zed_cam.isOpened()) :
 
         # display input image (combined left and right)
 
-        cv2.imshow(windowName,frame);
+        if (not(args.nooriginal)):
+            cv2.imshow(windowName,frame);
 
         # stop the timer and convert to ms. (to see how long processing and display takes)
 
@@ -401,6 +405,8 @@ if (zed_cam.isOpened()) :
             args.sidebysideh = not(args.sidebysideh);
         elif (key == ord('v')):
             args.sidebysidev = not(args.sidebysidev);
+        elif (key == ord('o')):
+            args.nooriginal = not(args.nooriginal);
         elif (key == ord(' ')):
 
             # cycle camera resolutions to get the next one on the list
