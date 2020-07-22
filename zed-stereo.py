@@ -117,7 +117,7 @@ if (args.serial > 0):
     if ((r.status_code == requests.codes.ok) and not("ERROR" in r.text)):
 
         with open("zed-cam-sn-"+str(args.serial)+".conf", "w") as config_file:
-            config_file.write(r.text[1:]); # write to file skipping first blank character
+            config_file.write(r.text[0:]);
 
         path_to_config_file = "zed-cam-sn-"+str(args.serial)+".conf";
 
