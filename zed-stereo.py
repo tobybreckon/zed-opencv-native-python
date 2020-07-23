@@ -16,7 +16,6 @@ import math
 import requests
 import configparser
 
-from camera_stream import *
 from zed_calibration import *
 from utils import *
 
@@ -148,7 +147,18 @@ else:
 
 # define video capture object as a threaded video stream
 
-zed_cam = CameraVideoStream();
+try:
+    # to use a non-buffered camera stream (via a separate thread)
+
+    import camera_stream
+    zed_cam = camera_stream.CameraVideoStream()
+
+except BaseException:
+    # if not then just use OpenCV default
+
+    print("INFO: camera_stream class not found - camera input may be buffered")
+    zed_cam = cv2.VideoCapture()
+
 zed_cam.open(args.camera_to_use);
 
 if (zed_cam.isOpened()):
@@ -423,8 +433,8 @@ if (zed_cam.isOpened()) :
 
                         # get new camera resolution
 
-                        width = next(key for key, value in config_options_width.items() if value == camera_mode)
-                        height = next(key for key, value in config_options_height.items() if value == camera_mode)
+                        width_new = next(key for key, value in config_options_width.items() if value == camera_mode)
+                        height_new = next(key for key, value in config_options_height.items() if value == camera_mode)
 
                         print ("Changing camera config to use: ", camera_mode, " @ ", width, " x ", height);
                         break;
@@ -433,13 +443,15 @@ if (zed_cam.isOpened()) :
 
             # reset to new camera resolution
 
-            zed_cam.set(cv2.CAP_PROP_FRAME_WIDTH, float(width))
-            zed_cam.set(cv2.CAP_PROP_FRAME_HEIGHT, float(height))
+            zed_cam.set(cv2.CAP_PROP_FRAME_WIDTH, width_new)
+            zed_cam.set(cv2.CAP_PROP_FRAME_HEIGHT, height_new)
+
+            zed_cam.read()
 
             width = int(zed_cam.get(cv2.CAP_PROP_FRAME_WIDTH))
             height =  int(zed_cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
 
-            print ("Camera config confirmed back from camera as: ", width , " x ", height);
+            print("Camera config confirmed back from camera as: ", width , " x ", height);
             print();
             print("ZED left/right resolution: ", int(width/2), " x ",  int(height));
             print("ZED mode: ", camera_mode);
