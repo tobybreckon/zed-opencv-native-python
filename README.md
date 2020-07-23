@@ -8,7 +8,7 @@ Alternatively, if you want to use OpenCV with the ZED SDK features, check out th
 
 In addition to manufacturer supplied calibration files, the ```-xml``` option alternatively facilitates the use of ```calibration.xml``` files generated via a 5-stage chessboard target based, manual calibration process performed using the [stereo_sgbm.py](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py) example tool from our [python-examples-cv](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py) teaching repository.
 
-Developed to support teaching within the undergraduate Computer Science programme at [Durham University](http://www.durham.ac.uk) (UK) by [Prof. Toby Breckon](http://community.dur.ac.uk/toby.breckon/). All tested with [OpenCV](http://www.opencv.org) 3.x and Python 3.x.
+Developed to support teaching within the undergraduate Computer Science programme at [Durham University](http://www.durham.ac.uk) (UK) by [Prof. Toby Breckon](http://community.dur.ac.uk/toby.breckon/). All tested with [OpenCV](http://www.opencv.org) 4.x and Python 3.x.
 
 ---
 
