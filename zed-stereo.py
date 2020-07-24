@@ -95,6 +95,7 @@ parser.add_argument("-hs", "--sidebysideh", action='store_true', help="display l
 parser.add_argument("-vs", "--sidebysidev", action='store_true', help="display left image and disparity top to bottom vertically (stacked)")
 parser.add_argument("-no", "--nooriginal", action='store_true', help="do not display original live image from camera")
 parser.add_argument("-xml", "--config_file_xml", type=str, help="manual camera calibration XML configuration file", default='')
+parser.add_argument("-lrl", "--leftrightleft", action='store_true', help="perform left to right + right to left matching and least square filtering")
 parser.add_argument("--showcontrols", action='store_true', help="display track bar disparity tuning controls")
 
 args = parser.parse_args()
@@ -213,6 +214,7 @@ print("t \t - toggle display centre target cross-hairs and depth")
 print("h \t - toggle horizontal side by side [left image | disparity]")
 print("v \t - toggle vertical side by side [left image | disparity]")
 print("o \t - toggle original live image display")
+print("w \t - toggle left->right + right->left weighted least squares filtering")
 print("i \t - toggle disparity in-filling via interpolation")
 print("x \t - exit")
 print()
@@ -268,6 +270,20 @@ stereoProcessor = cv2.StereoSGBM_create(
         mode=cv2.STEREO_SGBM_MODE_HH
 )
 
+# set up left to right + right to left left->right + right->left matching +
+# weighted least squares filtering (not used by default)
+
+left_matcher = stereoProcessor
+right_matcher = cv2.ximgproc.createRightMatcher(left_matcher)
+
+lmbda = 800
+sigma = 1.2
+visual_multiplier = 1.0
+
+wls_filter = cv2.ximgproc.createDisparityWLSFilter(matcher_left=left_matcher)
+wls_filter.setLambda(lmbda)
+wls_filter.setSigmaColor(sigma)
+
 ################################################################################
 
 # if camera is successfully connected
@@ -295,8 +311,8 @@ if (zed_cam.isOpened()) :
         cv2.createTrackbar("Window Size: ", windowNameD, window_size, 50, on_trackbar_set_blocksize)
         cv2.createTrackbar("Speckle Window: ", windowNameD, 0, 200, on_trackbar_set_speckle_window)
         cv2.createTrackbar("LR Disparity Check Diff:", windowNameD, 0, 25, on_trackbar_set_setDisp12MaxDiff)
-        cv2.createTrackbar("Disaprity Smoothness P1: ", windowNameD, 0, 4000, on_trackbar_set_setP1)
-        cv2.createTrackbar("Disaprity Smoothness P2: ", windowNameD, 0, 16000, on_trackbar_set_setP2)
+        cv2.createTrackbar("Disparity Smoothness P1: ", windowNameD, 0, 4000, on_trackbar_set_setP1)
+        cv2.createTrackbar("Disparity Smoothness P2: ", windowNameD, 0, 16000, on_trackbar_set_setP2)
         cv2.createTrackbar("Pre-filter Sobel-x- cap: ", windowNameD, 0, 5, on_trackbar_set_setPreFilterCap)
         cv2.createTrackbar("Winning Match Cost Margin %: ", windowNameD, 0, 20, on_trackbar_set_setUniquenessRatio)
 
@@ -342,7 +358,15 @@ if (zed_cam.isOpened()) :
         # compute disparity image from undistorted and rectified versions
         # (which for reasons best known to the OpenCV developers is returned scaled by 16)
 
-        disparity = stereoProcessor.compute(cv2.UMat(grayL),cv2.UMat(grayR))
+        if (args.leftrightleft):
+            displ = left_matcher.compute(cv2.UMat(grayL),cv2.UMat(grayR))  # .astype(np.float32)/16
+            dispr = right_matcher.compute(cv2.UMat(grayR),cv2.UMat(grayL))  # .astype(np.float32)/16
+            displ = np.int16(cv2.UMat.get(displ))
+            dispr = np.int16(cv2.UMat.get(dispr))
+            disparity = wls_filter.filter(displ, grayL, None, dispr)
+        else:
+            disparity_UMat = stereoProcessor.compute(cv2.UMat(grayL),cv2.UMat(grayR))
+            disparity = cv2.UMat.get(disparity_UMat)
 
         # cv2.filterSpeckles(disparity, 0, 4000, max_disparity)
 
@@ -353,7 +377,7 @@ if (zed_cam.isOpened()) :
         # as disparity=-1 means no disparity available
 
         _, disparity = cv2.threshold(disparity,0, max_disparity * 16, cv2.THRESH_TOZERO)
-        disparity_scaled = (cv2.UMat.get(disparity) / 16.).astype(np.uint8)
+        disparity_scaled = (disparity / 16.).astype(np.uint8)
 
         # fill disparity if requested
 
@@ -430,6 +454,8 @@ if (zed_cam.isOpened()) :
             args.sidebysidev = not(args.sidebysidev)
         elif (key == ord('o')):
             args.nooriginal = not(args.nooriginal)
+        elif (key == ord('w')):
+            args.leftrightleft = not(args.leftrightleft)
         elif (key == ord(' ')):
 
             # cycle camera resolutions to get the next one on the list

@@ -31,8 +31,8 @@ In general, this example can be used as follows:
 
 ```
 usage: zed-stereo.py [-h] [-c CAMERA_TO_USE] [-s SERIAL] [-cf CONFIG_FILE]
-                     [-cm] [-fix] [-fill] [-fs] [-t] [-hs] [-vs]
-                     [-xml CONFIG_FILE_XML] [--showcontrols]
+                     [-cm] [-fix] [-fill] [-fs] [-t] [-hs] [-vs] [-no]
+                     [-xml CONFIG_FILE_XML] [-lrl] [--showcontrols]
 
 Native live stereo from a StereoLabs ZED camera using factory calibration.
 
@@ -59,8 +59,12 @@ optional arguments:
                         horizontally (stacked)
   -vs, --sidebysidev    display left image and disparity top to bottom
                         vertically (stacked)
+  -no, --nooriginal     do not display original live image from camera
   -xml CONFIG_FILE_XML, --config_file_xml CONFIG_FILE_XML
                         manual camera calibration XML configuration file
+  -lrl, --leftrightleft
+                        perform left to right + right to left matching and
+                        weighted least square filtering
   --showcontrols        display track bar disparity tuning controls
 ```
 
@@ -73,9 +77,10 @@ c        - toggle disparity false colour mapping
 t        - toggle display centre target cross-hairs and depth
 h        - toggle horizontal side by side [left image | disparity]
 v        - toggle vertical side by side [left image | disparity]
+o        - toggle original live image display
+w        - toggle left->right + right->left weighted least squares filtering
 i        - toggle disparity in-filling via interpolation
 x        - exit
-
 ```
 
 Left click mouse in disparity image to print depth value at that point (beware that depth values in VGA mode maybe wrong unless ```-fix``` option is used). Changing between the resolutions worked when tested although it appears it does cause the camera image to freeze sometimes.
