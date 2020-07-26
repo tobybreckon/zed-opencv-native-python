@@ -281,7 +281,6 @@ right_matcher = cv2.ximgproc.createRightMatcher(left_matcher)
 
 lmbda = 800
 sigma = 1.2
-visual_multiplier = 1.0
 
 wls_filter = cv2.ximgproc.createDisparityWLSFilter(matcher_left=left_matcher)
 wls_filter.setLambda(lmbda)
