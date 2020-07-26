@@ -78,6 +78,12 @@ def on_trackbar_set_setPreFilterCap(value):
 def on_trackbar_set_setUniquenessRatio(value):
     stereoProcessor.setUniquenessRatio(value)
 
+def on_trackbar_set_wlsLmbda(value):
+    wls_filter.setLambda(value)
+
+def on_trackbar_set_wlsSigmaColor(value):
+    wls_filter.setSigmaColor(value * 0.1)
+
 def on_trackbar_null(value):
     return
 
@@ -279,12 +285,12 @@ stereoProcessor = cv2.StereoSGBM_create(
 left_matcher = stereoProcessor
 right_matcher = cv2.ximgproc.createRightMatcher(left_matcher)
 
-lmbda = 800
-sigma = 1.2
+wls_lmbda = 800
+wls_sigma = 1.2
 
 wls_filter = cv2.ximgproc.createDisparityWLSFilter(matcher_left=left_matcher)
-wls_filter.setLambda(lmbda)
-wls_filter.setSigmaColor(sigma)
+wls_filter.setLambda(wls_lmbda)
+wls_filter.setSigmaColor(wls_sigma)
 
 ################################################################################
 
@@ -319,8 +325,9 @@ if (zed_cam.isOpened()) :
         cv2.createTrackbar("Winning Match Cost Margin %: ", windowNameD, 0, 20, on_trackbar_set_setUniquenessRatio)
         cv2.createTrackbar("Speckle Size: ", windowNameD, math.floor((width * height) * 0.0005), 10000, on_trackbar_null)
         cv2.createTrackbar("Max Speckle Diff: ", windowNameD, 16, 2048, on_trackbar_null)
-
-    #cv2.createTrackbar(windowNameD,"Max Disparity: ", 0, 128, on_trackbar_set_disparities)
+        if (args.leftrightleft):
+            cv2.createTrackbar("WLS Filter Lambda: ", windowNameD, wls_lmbda, 10000, on_trackbar_set_wlsLmbda)
+            cv2.createTrackbar("WLS Filter Sigma Color (x 0.1): ", windowNameD, math.ceil(wls_sigma / 0.1), 50, on_trackbar_set_wlsSigmaColor)
 
     # loop control flags
 
@@ -447,7 +454,7 @@ if (zed_cam.isOpened()) :
 
         key = cv2.waitKey(max(2, 40 - int(math.ceil(stop_t)))) & 0xFF
 
-        # e.g. if user presses "x" then exit  / press "f" for fullscreen display
+        # user keyboard controls
 
         if (key == ord('x')):
             keep_processing = False
