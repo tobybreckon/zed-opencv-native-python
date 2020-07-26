@@ -27,7 +27,7 @@ def on_mouse_display_depth_value(event, x, y, flags, params):
 
     # when the left mouse button has been clicked
 
-    if ((event == cv2.EVENT_LBUTTONDOWN) and not((args.sidebysidev) or (args.sidebysidev))):
+    if ((event == cv2.EVENT_LBUTTONDOWN) and not((args.sidebysidev) or (args.sidebysideh))):
 
         # unpack the set of parameters
 
@@ -77,6 +77,9 @@ def on_trackbar_set_setPreFilterCap(value):
 
 def on_trackbar_set_setUniquenessRatio(value):
     stereoProcessor.setUniquenessRatio(value)
+
+def on_trackbar_null(value):
+    return
 
 ################################################################################
 
@@ -315,6 +318,8 @@ if (zed_cam.isOpened()) :
         cv2.createTrackbar("Disparity Smoothness P2: ", windowNameD, 0, 16000, on_trackbar_set_setP2)
         cv2.createTrackbar("Pre-filter Sobel-x- cap: ", windowNameD, 0, 5, on_trackbar_set_setPreFilterCap)
         cv2.createTrackbar("Winning Match Cost Margin %: ", windowNameD, 0, 20, on_trackbar_set_setUniquenessRatio)
+        cv2.createTrackbar("Speckle Size: ", windowNameD, math.floor((width * height) * 0.0005), 10000, on_trackbar_null)
+        cv2.createTrackbar("Max Speckle Diff: ", windowNameD, 16, 2048, on_trackbar_null)
 
     #cv2.createTrackbar(windowNameD,"Max Disparity: ", 0, 128, on_trackbar_set_disparities)
 
@@ -368,7 +373,14 @@ if (zed_cam.isOpened()) :
             disparity_UMat = stereoProcessor.compute(cv2.UMat(grayL),cv2.UMat(grayR))
             disparity = cv2.UMat.get(disparity_UMat)
 
-        # cv2.filterSpeckles(disparity, 0, 4000, max_disparity)
+        if (args.showcontrols):
+            speckleSize = cv2.getTrackbarPos("Speckle Size: ", windowNameD)
+            maxSpeckleDiff = cv2.getTrackbarPos("Max Speckle Diff: ", windowNameD)
+        else:
+            speckleSize = math.floor((width * height) * 0.0005)
+            maxSpeckleDiff = (8 * 16) # 128
+
+        cv2.filterSpeckles(disparity, 0, speckleSize, maxSpeckleDiff)
 
         # scale the disparity to 8-bit for viewing
         # divide by 16 and convert to 8-bit image (then range of values should
