@@ -169,13 +169,7 @@ except BaseException:
     print("INFO: camera_stream class not found - camera input may be buffered")
     zed_cam = cv2.VideoCapture()
 
-# set the video capture backend
-# (mut be V4L by default under linux, otherwise mode switching fails)
-
-if sys.platform.startswith('linux'):
-    zed_cam.open(args.camera_to_use, cv2.CAP_V4L)
-else:
-    zed_cam.open(args.camera_to_use)
+zed_cam.open(args.camera_to_use)
 
 print("INFO: camera backend is:", zed_cam.getBackendName())
 print()
