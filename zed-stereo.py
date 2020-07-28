@@ -171,13 +171,12 @@ except BaseException:
 
 zed_cam.open(args.camera_to_use)
 
-print("INFO: camera backend is:", zed_cam.getBackendName())
-print()
-
 # check open and read video frame
 
 if (zed_cam.isOpened()):
     ret, frame = zed_cam.read()
+    print("INFO: camera backend is:", zed_cam.getBackendName())
+    print()
 else:
     print("Error - selected camera #", args.camera_to_use, " : not found.")
     exit(1)
