@@ -2,7 +2,7 @@
 
 ![alt text](https://raw.githubusercontent.com/apennisi/ZedCameraGrabber/master/images/zed.jpg)
 
-This sample shows how to capture rectified images with the StereoLabs ZED (or ZED-M) Stereo Camera and OpenCV, **without the ZED SDK**, using only Python. It is inspired by the C++version of the same available from [stereolabs](https://github.com/stereolabs/zed-opencv-native). As the images supplied from the ZED stereo camera are already rectified, we do not need to use the calibration to rectify the images further before performing the disparity calculation but the intrinsics and extrinsics (camera matrix _K_, focal length _f_, and baseline, _B_) are required for subsequent depth (distance) recovery.
+This sample shows how to capture rectified images and compute the scene disparity/depth with the StereoLabs ZED (or ZED-M) Stereo Camera and OpenCV, **without the ZED SDK**, using only Python. It is inspired by the C++version of the same available from [stereolabs](https://github.com/stereolabs/zed-opencv-native). As the images supplied from the ZED stereo camera are already rectified, we do not need to use the calibration to rectify the images further before performing the disparity calculation but the intrinsics and extrinsics (camera matrix _K_, focal length _f_, and baseline, _B_) are required for subsequent depth (distance) recovery.
 
 Alternatively, if you want to use OpenCV with the ZED SDK features, check out the StereoLabs sample [here](https://github.com/stereolabs/zed-opencv).
 
@@ -103,7 +103,7 @@ For teaching and learning, this codebase contains several re-usable exemplar ele
 
 ### References:
 
-If using this example in your own work (e.g _"... based on the implementation of REF..."_), please reference our related research work:
+If using this example in your own work (e.g _"... based on the implementation of REF..."_), please reference our related research work from which the default parameters for the Semi-Global Block Matching [Hirschmuller, 2007] approach were derived:
 
 - [Generalized Dynamic Object Removal for Dense Stereo Vision Based Scene Mapping using Synthesised Optical Flow](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton16removal.pdf) (O.K. Hamilton, T.P. Breckon), In Proc. International Conference on Image Processing, IEEE, pp. 3439-3443, 2016. [[pdf]](http://community.dur.ac.uk/toby.breckon/publications/papers/hamilton16removal.pdf)
 
