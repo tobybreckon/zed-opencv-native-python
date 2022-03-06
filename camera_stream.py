@@ -14,7 +14,7 @@
 
 ##########################################################################
 
-# suggested usage - as per example in canny.py found at:
+# suggested basic usage - as per example in canny.py found at:
 # https://github.com/tobybreckon/python-examples-cv/blob/master/canny.py
 
 # try:
@@ -28,6 +28,13 @@
 # in the above example this makes use of the CameraVideoStream if it is
 # available (i.e. camera_stream.py is in the module search path) and
 # falls back to using cv2.VideoCapture otherwise
+
+# OpenCV T-API usage - alternative usage to enable OpenCV Transparent API
+# h/w acceleration where available on all subsequent processing of image
+# ....
+#    import camera_stream
+#    cap = camera_stream.CameraVideoStream(use_tapi=True)
+# ....
 
 ##########################################################################
 
@@ -110,7 +117,7 @@ class CameraVideoStream:
         elif sys.platform.startswith('win'):        # MS Windows
             self.backend_default = cv2.CAP_DSHOW
         elif sys.platform.startswith('darwin'):     # macOS
-            self.backend_default = cv2.CAP_QT
+            self.backend_default = cv2.CAP_AVFOUNDATION
         else:
             self.backend_default = cv2.CAP_ANY      # auto-detect via OpenCV
 
