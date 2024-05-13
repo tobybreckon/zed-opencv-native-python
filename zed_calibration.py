@@ -47,9 +47,9 @@ def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
     Lcy = float(left['cy'])
     Lk1 = float(left['k1'])
     Lk2 = float(left['k2'])
-    Lk3 = 0
-    Lp1 = float(left['p1'])
-    Lp2 = float(left['p2'])
+    Lk3 =  float(left['k3'])
+    Lk4 = float(left['k4'])
+    Lk5 = 0
 
     #[RIGHT_CAM_xxx]  - intrinsics
 
@@ -59,9 +59,9 @@ def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
     Rcy = float(right['cy'])
     Rk1 = float(right['k1'])
     Rk2 = float(right['k2'])
-    Rk3 = 0
-    Rp1 = float(right['p1'])
-    Rp2 = float(right['p2'])
+    Rk3 =  float(left['k3'])
+    Rk4 = float(left['k4'])
+    Rk5 = 0
 
     # define intrinsic camera matrices, K for {left, right} caneras
 
