@@ -47,10 +47,24 @@ def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
     Lcy = float(left['cy'])
     Lk1 = float(left['k1'])
     Lk2 = float(left['k2'])
-    Lk3 = 0
-    Lp1 = float(left['p1'])
-    Lp2 = float(left['p2'])
+    Lk3 =  float(left['k3'])
 
+    try:
+        
+        # handle newer ZED model conf formats
+
+        Lk4 = float(left['k4'])
+        Lk5 = 0
+        distCoeffsL = np.array([[Lk1], [Lk2], [Lk3], [Lk4], [Lk5]])
+
+    except BaseException:
+
+        # handle older ZED model conf formats
+
+        Lp1 = float(left['p1'])
+        Lp2 = float(left['p2'])
+        distCoeffsL = np.array([[Lk1], [Lk2], [Lk3], [Lp1], [Lp2]])
+   
     #[RIGHT_CAM_xxx]  - intrinsics
 
     Rfx = float(right['fx'])
@@ -59,20 +73,28 @@ def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
     Rcy = float(right['cy'])
     Rk1 = float(right['k1'])
     Rk2 = float(right['k2'])
-    Rk3 = 0
-    Rp1 = float(right['p1'])
-    Rp2 = float(right['p2'])
+    Rk3 =  float(left['k3'])
+    try:
+        
+        # handle newer ZED model conf formats
+        
+
+        Rk4 = float(left['k4'])
+        Rk5 = 0
+        distCoeffsR = np.array([[Rk1], [Rk2], [Rk3], [Rk4], [Rk5]])
+
+    except BaseException:
+
+        # handle older ZED model conf formats
+
+        Rp1 = float(left['p1'])
+        Rp2 = float(left['p2'])
+        distCoeffsR = np.array([[Rk1], [Rk2], [Rk3], [Rp1], [Rp2]])
 
     # define intrinsic camera matrices, K for {left, right} caneras
 
     K_CameraMatrix_left = np.array([[Lfx, 0, Lcx],[ 0, Lfy, Lcy],[0, 0, 1]])
     K_CameraMatrix_right = np.array([[Rfx, 0, Rcx],[ 0, Rfy, Rcy],[0, 0, 1]])
-
-    # define intrinsic camera distortion coefficients, for {left, right} caneras
-    # N.B. in ZED code last three values are zero by default
-
-    distCoeffsR = np.array([[Rk1], [Rk2], [Rk3], [Rp1], [Rp2]])
-    distCoeffsL = np.array([[Lk1], [Lk2], [Lk3], [Lp1], [Lp2]])
 
     # camera - extrinsics
 
