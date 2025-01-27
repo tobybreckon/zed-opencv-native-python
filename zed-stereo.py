@@ -230,7 +230,12 @@ if (camera_calibration_available):
     cam_calibration = configparser.ConfigParser()
     cam_calibration.read(path_to_config_file)
     fx, fy, B, Kl, Kr, R, T, Q = zed_camera_calibration(cam_calibration, camera_mode, width, height)
-
+    
+    # assume distortion is zero (!)
+    
+    Dl = np.zeros((1,5), dtype=np.uint8) 
+    Dr = np.zeros((1,5), dtype=np.uint8)
+    
     # correct factory supplied values if specified
 
     if ((args.correct_focal_length) and (camera_mode == "VGA")):
@@ -241,7 +246,7 @@ if (camera_calibration_available):
         Q[2][3] = fx
         Q[3][3] = 0 # as Lcx == Rcx
 elif (manual_camera_calibration_available):
-    fx, fy, B, Kl, Kr, R, T, Q = read_manual_calibration(path_to_config_file)
+    fx, fy, B, Kl, Kr, R, T, Q, Dl, Dr = read_manual_calibration(path_to_config_file)
     # no correction needed here
 
 ################################################################################
@@ -269,7 +274,7 @@ stereoProcessor = cv2.StereoSGBM_create(
         #speckleWindowSize=0,
         #speckleRange=2,
         #preFilterCap=63,
-        mode=cv2.STEREO_SGBM_MODE_HH
+        # mode=cv2.STEREO_SGBM_MODE_HH
 )
 
 # set up left to right + right to left left->right + right->left matching +
@@ -300,11 +305,36 @@ if (zed_cam.isOpened()) :
     cv2.namedWindow(windowNameD, cv2.WINDOW_NORMAL)
     cv2.resizeWindow(windowNameD, int(width/2), height)
 
-    # if calibration is available then set call back to allow for depth display
-    # on left mouse button click
+     # read initial frame
 
-    if (camera_calibration_available):
+    ret, frame = zed_cam.read()
+
+    # split single ZED frame into left an right
+
+    frameL= frame[:,0:int(width/2),:]
+    frameR = frame[:,int(width/2):width,:]
+
+    # convert to grayscale (as the disparity matching works on grayscale)
+
+    grayL = cv2.cvtColor(frameL,cv2.COLOR_BGR2GRAY)
+    grayR = cv2.cvtColor(frameR,cv2.COLOR_BGR2GRAY)
+    
+    # if calibration is available then set call back to allow for depth display
+    # on left mouse button click + *** do rectification map setup ***
+
+    if ((camera_calibration_available) or (manual_camera_calibration_available)):
+        
         cv2.setMouseCallback(windowNameD,on_mouse_display_depth_value, (fx, B))
+        
+        RL, RR, PL, PR, Q, _, _ = cv2.stereoRectify(
+        Kl, Dl, Kr, Dr, grayL.shape[::-1], R, T, alpha=-1)
+        
+        mapL1, mapL2 = cv2.initUndistortRectifyMap(
+        Kl, Dl, RL, PL, grayL.shape[::-1],
+        cv2.CV_32FC1)
+        mapR1, mapR2 = cv2.initUndistortRectifyMap(
+        Kr, Dr, RR, PR, grayR.shape[::-1],
+        cv2.CV_32FC1)
 
     # if specified add trackbars
     if (args.showcontrols):
@@ -352,12 +382,18 @@ if (zed_cam.isOpened()) :
 
         grayL = cv2.cvtColor(frameL,cv2.COLOR_BGR2GRAY)
         grayR = cv2.cvtColor(frameR,cv2.COLOR_BGR2GRAY)
+        
+        # undistort and rectify based on the mappings (could improve interpolation
+        # and image border settings here)
+
+        undistorted_rectifiedL = cv2.remap(frameL, mapL1, mapL2, cv2.INTER_LINEAR)
+        undistorted_rectifiedR = cv2.remap(frameR, mapR1, mapR2, cv2.INTER_LINEAR)
 
         # perform preprocessing - raise to the power, as this subjectively appears
         # to improve subsequent disparity calculation
 
-        grayL = np.power(grayL, 0.75).astype('uint8')
-        grayR = np.power(grayR, 0.75).astype('uint8')
+        grayL = np.power(undistorted_rectifiedL, 0.75).astype('uint8')
+        grayR = np.power(undistorted_rectifiedR, 0.75).astype('uint8')
 
         # compute disparity image from undistorted and rectified versions
         # (which for reasons best known to the OpenCV developers is returned scaled by 16)
@@ -376,7 +412,7 @@ if (zed_cam.isOpened()) :
             speckleSize = cv2.getTrackbarPos("Speckle Size: ", windowNameD)
             maxSpeckleDiff = cv2.getTrackbarPos("Max Speckle Diff: ", windowNameD)
         else:
-            speckleSize = math.floor((width * height) * 0.0005)
+            speckleSize = math.floor((width * height) * 0.0005 / 3)
             maxSpeckleDiff = (8 * 16) # 128
 
         cv2.filterSpeckles(disparity, 0, speckleSize, maxSpeckleDiff)

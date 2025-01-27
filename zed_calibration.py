@@ -150,6 +150,8 @@ def read_manual_calibration(calibration_file):
     # R - inter-camera rotation matrix (3 x 3)
     # T - inter-camera translation vector (3 x 1)
     # Q - disparity map (2D) to depth map projection (3D) projection matrix
+    # Dl - distortion coefficients left
+    # De - distortion coefficients right
 
     f= cv2.FileStorage(calibration_file,cv2.FILE_STORAGE_READ)
 
@@ -163,11 +165,13 @@ def read_manual_calibration(calibration_file):
             T = f.getNode("T").mat()
             Baseline = -1 * T[0][0] # i.e. x-axis of T vector
             Q = f.getNode("Q").mat()
+            Dl = f.getNode("distort_l").mat()
+            Dr = f.getNode("distort_r").mat()
         except:
             print("Error - specified XML config file does not contain valid camera config.")
             exit(1)
 
-        return Lfx, Lfy, Baseline, K_CameraMatrix_left, K_CameraMatrix_right, R, T, Q
+        return Lfx, Lfy, Baseline, K_CameraMatrix_left, K_CameraMatrix_right, R, T, Q, Dl, Dr
 
     else:
         print("Error - cannot open specified XML config file.")
