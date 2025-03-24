@@ -1,4 +1,4 @@
-################################################################################
+##########################################################################
 
 # image manipulation utilities - general and stereo camera specific
 
@@ -6,15 +6,16 @@
 
 # License: MIT License (MIT)
 
-################################################################################
+##########################################################################
 
 import cv2
 import numpy as np
 
-################################################################################
+##########################################################################
 
 # concatenate two RGB/grayscale images horizontally (left to right) handling
 # differing channel numbers or image heights in the input
+
 
 def h_concatenate(img1, img2):
 
@@ -42,7 +43,7 @@ def h_concatenate(img1, img2):
     elif ((channels2 > channels1) and (channels2 == 3)):
         out1 = cv2.cvtColor(img1, cv2.COLOR_GRAY2BGR)
         out2 = img2
-    else: # both must be equal
+    else:  # both must be equal
         out1 = img1
         out2 = img2
 
@@ -53,10 +54,11 @@ def h_concatenate(img1, img2):
 
     return np.hstack((out1, out2))
 
-################################################################################
+##########################################################################
 
 # concatenate two RGB/grayscale images vertically (top to bottom) handling
 # differing channel numbers or image heights in the input
+
 
 def v_concatenate(img1, img2):
 
@@ -84,7 +86,7 @@ def v_concatenate(img1, img2):
     elif ((channels2 > channels1) and (channels2 == 3)):
         out1 = cv2.cvtColor(img1, cv2.COLOR_GRAY2BGR)
         out2 = img2
-    else: # both must be equal
+    else:  # both must be equal
         out1 = img1
         out2 = img2
 
@@ -95,4 +97,4 @@ def v_concatenate(img1, img2):
 
     return np.vstack((out1, out2))
 
-################################################################################
+##########################################################################
