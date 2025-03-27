@@ -22,7 +22,7 @@ def h_concatenate(img1, img2):
     # get size and channels for both images
 
     height1 = img1.shape[0]
-    width1 = img1.shape[1]
+
     if (len(img1.shape) == 2):
         channels1 = 1
     else:
@@ -62,10 +62,10 @@ def h_concatenate(img1, img2):
 
 def v_concatenate(img1, img2):
 
-    # get size and channels for both images
+    # get width and channels for both images
 
-    height1 = img1.shape[0]
     width1 = img1.shape[1]
+    
     if (len(img1.shape) == 2):
         channels1 = 1
     else:
