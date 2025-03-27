@@ -1,4 +1,4 @@
-################################################################################
+##########################################################################
 
 # native stereo camera calibration using the StereoLabs ZED camera in Python
 
@@ -6,12 +6,12 @@
 
 # License: MIT License (MIT)
 
-################################################################################
+##########################################################################
 
 import cv2
 import numpy as np
 
-################################################################################
+##########################################################################
 
 # read zed stereo camera calibration based on camera calibration data read
 # from manufacturer provided calibration file
@@ -28,18 +28,20 @@ import numpy as np
 # https://github.com/stereolabs/zed-opencv-native/blob/master/include/calibration.hpp
 # https://github.com/LarkinLabs/SRAAS/blob/master/ZED_CV2.py
 
-def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
+
+def zed_camera_calibration(
+        camera_calibration, camera_mode, full_width, height):
 
     try:
 
-        left = camera_calibration['LEFT_CAM_'+camera_mode]
-        right = camera_calibration['RIGHT_CAM_'+camera_mode]
+        left = camera_calibration['LEFT_CAM_' + camera_mode]
+        right = camera_calibration['RIGHT_CAM_' + camera_mode]
         common = camera_calibration['STEREO']
-    except:
+    except BaseException:
         print("Error - specified config file does not contain valid ZED config.")
         exit(1)
 
-    #[LEFT_CAM_xxx] - intrinsics
+    # [LEFT_CAM_xxx] - intrinsics
 
     Lfx = float(left['fx'])
     Lfy = float(left['fy'])
@@ -47,10 +49,10 @@ def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
     Lcy = float(left['cy'])
     Lk1 = float(left['k1'])
     Lk2 = float(left['k2'])
-    Lk3 =  float(left['k3'])
+    Lk3 = float(left['k3'])
 
     try:
-        
+
         # handle newer ZED model conf formats
 
         Lk4 = float(left['k4'])
@@ -64,8 +66,8 @@ def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
         Lp1 = float(left['p1'])
         Lp2 = float(left['p2'])
         distCoeffsL = np.array([[Lk1], [Lk2], [Lk3], [Lp1], [Lp2]])
-   
-    #[RIGHT_CAM_xxx]  - intrinsics
+
+    # [RIGHT_CAM_xxx]  - intrinsics
 
     Rfx = float(right['fx'])
     Rfy = float(right['fy'])
@@ -73,11 +75,10 @@ def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
     Rcy = float(right['cy'])
     Rk1 = float(right['k1'])
     Rk2 = float(right['k2'])
-    Rk3 =  float(left['k3'])
+    Rk3 = float(left['k3'])
     try:
-        
+
         # handle newer ZED model conf formats
-        
 
         Rk4 = float(left['k4'])
         Rk5 = 0
@@ -93,33 +94,33 @@ def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
 
     # define intrinsic camera matrices, K for {left, right} caneras
 
-    K_CameraMatrix_left = np.array([[Lfx, 0, Lcx],[ 0, Lfy, Lcy],[0, 0, 1]])
-    K_CameraMatrix_right = np.array([[Rfx, 0, Rcx],[ 0, Rfy, Rcy],[0, 0, 1]])
+    K_CameraMatrix_left = np.array([[Lfx, 0, Lcx], [0, Lfy, Lcy], [0, 0, 1]])
+    K_CameraMatrix_right = np.array([[Rfx, 0, Rcx], [0, Rfy, Rcy], [0, 0, 1]])
 
     # camera - extrinsics
 
     Baseline = float(common['Baseline'])
-    CV = float(common['CV_'+camera_mode])
-    RX = float(common['RX_'+camera_mode])
-    RZ = float(common['RZ_'+camera_mode])
+    CV = float(common['CV_' + camera_mode])
+    RX = float(common['RX_' + camera_mode])
+    RZ = float(common['RZ_' + camera_mode])
 
     # define rotation matrix, R
 
     R_xyz_vector = np.array([[RX], [CV], [RZ]])
-    R,_ = cv2.Rodrigues(R_xyz_vector)
+    R, _ = cv2.Rodrigues(R_xyz_vector)
 
     # define translation vector, T (baseline is x-axis)
 
-    T = np.array([[Baseline],[0],[0]])
+    T = np.array([[Baseline], [0], [0]])
 
     # define the Q matrix for disparity map (2D) to depth map projection (3D)
     # (reference: Learning OpenCV - Gary Bradski, Adrian Kaehler, 2008)
 
-    Q = np.array([  [1, 0, 0, -1*Lcx],
-                    [0, 1, 0, -1*Lcy],
-                    [0, 0, 0, Lfx],
-                    [0, 0, -1.0/Baseline, ((Lcx - Rcx) / Baseline)]]
-                )
+    Q = np.array([[1, 0, 0, -1 * Lcx],
+                  [0, 1, 0, -1 * Lcy],
+                  [0, 0, 0, Lfx],
+                  [0, 0, -1.0 / Baseline, ((Lcx - Rcx) / Baseline)]]
+                 )
 
     # depth image is registered against left image so return set of values
     # as (fx, fy, B, Kl, Kr, R, T, Q) which are:
@@ -137,7 +138,7 @@ def zed_camera_calibration(camera_calibration, camera_mode, full_width, height):
     return Lfx, Lfy, Baseline, K_CameraMatrix_left, K_CameraMatrix_right, R, T, Q
 
 
-################################################################################
+##########################################################################
 
 def read_manual_calibration(calibration_file):
 
@@ -153,7 +154,7 @@ def read_manual_calibration(calibration_file):
     # Dl - distortion coefficients left
     # De - distortion coefficients right
 
-    f= cv2.FileStorage(calibration_file,cv2.FILE_STORAGE_READ)
+    f = cv2.FileStorage(calibration_file, cv2.FILE_STORAGE_READ)
 
     if (f.isOpened()):
         try:
@@ -163,12 +164,13 @@ def read_manual_calibration(calibration_file):
             Lfy = K_CameraMatrix_left[1][1]
             R = f.getNode("R").mat()
             T = f.getNode("T").mat()
-            Baseline = -1 * T[0][0] # i.e. x-axis of T vector
+            Baseline = -1 * T[0][0]  # i.e. x-axis of T vector
             Q = f.getNode("Q").mat()
             Dl = f.getNode("distort_l").mat()
             Dr = f.getNode("distort_r").mat()
-        except:
-            print("Error - specified XML config file does not contain valid camera config.")
+        except BaseException:
+            print(
+                "Error - specified XML config file does not contain valid camera config.")
             exit(1)
 
         return Lfx, Lfy, Baseline, K_CameraMatrix_left, K_CameraMatrix_right, R, T, Q, Dl, Dr
@@ -177,4 +179,4 @@ def read_manual_calibration(calibration_file):
         print("Error - cannot open specified XML config file.")
         exit(1)
 
-################################################################################
+##########################################################################

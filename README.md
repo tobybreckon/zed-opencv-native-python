@@ -2,7 +2,9 @@
 
 ![alt text](https://raw.githubusercontent.com/apennisi/ZedCameraGrabber/master/images/zed.jpg)
 
-This sample shows how to capture rectified images and compute the scene disparity/depth with the StereoLabs ZED (or ZED-M) Stereo Camera and OpenCV, **without the ZED SDK**, using only Python. It is inspired by the C++version of the same available from [stereolabs](https://github.com/stereolabs/zed-opencv-native). As the images supplied from the ZED stereo camera are already rectified, we do not need to use the calibration to rectify the images further before performing the disparity calculation but the intrinsics and extrinsics (camera matrix _K_, focal length _f_, and baseline, _B_) are required for subsequent depth (distance) recovery.
+This sample shows how to capture rectified images and compute the scene disparity/depth with the StereoLabs ZED (or ZED-M) Stereo Camera and OpenCV, **without the ZED SDK**, using only Python. It is inspired by the C++version of the same available from [stereolabs](https://github.com/stereolabs/zed-opencv-native). As the images supplied from the ZED stereo camera are already rectified (from factory calibration), we do not always need to use the calibration to rectify the images further* before performing the disparity calculation but the intrinsics and extrinsics (camera matrix _K_, focal length _f_, and baseline, _B_) are required for subsequent depth (distance) recovery.
+
+[*] _but we have noticed the calibration to change over time, requring recalibration using this [sepetrate python script tool](https://github.com/tobybreckon/python-examples-cv/blob/master/stereo_sgbm.py)._
 
 Alternatively, if you want to use OpenCV with the ZED SDK features, check out the StereoLabs sample [here](https://github.com/stereolabs/zed-opencv).
 
